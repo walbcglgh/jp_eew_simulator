@@ -1,360 +1,294 @@
 # 強震モニタ風地震シミュレーション
 
-日本の地震情報を視覚的にシミュレートするWebアプリケーションです。TurboWarpで実装された地震シミュレータで、強震モニタのようなリアルタイム地震情報の表現を学ぶことができます。
-
-## 🎮 使用方法
-
-### キーボード操作
-- **← / →**: 地震の規模（マグニチュード）を調整 (M0～M12)
-- **↑ / ↓**: 震源の深さを調整 (0～1000km)
-- **Q / W**: 発生時間を調整 (0～300秒)
-- **A**: 地震イベントの開始を主要動の到着と同期
-- **スペースキー** または **Startボタン**: シミュレーション開始
-- **マウスホイール**: マップズーム
-- **R**: カメラリセット
-
-### 機能
-- 📊 地震の規模・深さ・発生時間をリアルタイム調整
-- 🗺️ 日本全国の地震情報表示
-- 🌊 津波警報シミュレーション
-- 🔊 サウンドアラート機能
-- 📈 震度分布のリアルタイム表示
-- 💾 地震イベント情報の詳細表示
-
-## ⚙️ UI改善内容
-
-### v2.0 アップデート
-- **スライダーの美化**: グラデーション橙色デザインに変更
-  - ホバー時にスライダーが1.2倍に拡大
-  - 発光効果でより視覚的に
-  
-- **震央選択ボタンの改善**: 立体的なグラデーション設計
-  - ホバー時に1.05倍縮放
-  - より鮮やかな発光エフェクト
-  
-- **パラメータ範囲の拡張**
-  - 規模: M0～M12対応
-  - 深さ: 0～1000km対応
-  - 発生時間: 0～300秒対応
-
-## 🚀 デプロイ方法
-
-### Cloudflare Pages でのデプロイ
-
-1. **リポジトリをフォーク/クローン**
-   ```bash
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
-   cd JapanEewSimulator
-   ```
-
-2. **Cloudflare Pages に接続**
-   - [Cloudflare Pages Dashboard](https://dash.cloudflare.com/) にアクセス
-   - "Create a project" → "Connect to Git"
-   - GitHubアカウントを接続
-   - このリポジトリを選択
-
-3. **ビルド設定**
-   - Build command: なし（そのまま使用）
-   - Build output directory: `/` （ルートフォルダ）
-   - Environment variables: 不要
-
-4. **デプロイ実行**
-   - "Save and Deploy" をクリック
-   - デプロイ完了待ち（通常2～3分）
-   - 自動割り当てのURLでアクセス可能
-
-### ローカルサーバーでのテスト
-```bash
-# Python 3を使用
-python -m http.server 8000
-
-# または Node.js
-npx http-server
-```
-
-ブラウザで `http://localhost:8000` にアクセス
-
-## 📱 性能最適化
-
-- **クライアント負荷軽減**: Cloudflare Pages でホスティングすることで、複雑な計算をエッジで処理
-- **モバイル対応**: レスポンシブデザインで全デバイスに対応
-- **高速読み込み**: CDN経由で世界中から高速配信
-
-**推奨環境:**
-- Chrome/Edge/Firefox 最新版
-- メモリ: 512MB以上推奨
-- インターネット速度: 10Mbps以上推奨
-
-## ⚠️ 注意事項
-
-- 地震・津波シミュレーションは簡略化または独自の公式を使用しており、実際の現象と異なる場合があります
-- サウンドアラートを含むため、ボリューム調整にご注意ください
-- ブラウザのセキュリティ設定によっては一部機能が制限される可能性があります
-
-## 📄 ライセンス
-
-- **TurboWarp Packager**: Mozilla Public License 2.0
-- **Scratch**: MIT License
-- **このプロジェクト**: 改善版として配布
-
-詳細は各ファイルのライセンス表記を参照してください。
-
-## 🔗 参考リンク
-
-- [TurboWarp - Scratch Accelerator](https://turbowarp.org)
-- [TurboWarp 原始プロジェクト](https://turbowarp.org/1220818872)
-- [Scratch 公式サイト](https://scratch.mit.edu)
-- [Cloudflare Pages ドキュメント](https://developers.cloudflare.com/pages/)
-
-## 👤 クレジット
-
-- 原始プロジェクト作成者: TurboWarp/Scratch コミュニティ
-- UI改善版: walbcglgh (2026)
+TurboWarp（Scratch）で動作する、日本向けの地震・緊急地震速報（EEW）シミュレータです。震源・規模・深さ・発生タイミングを変えながら、P波/S波の伝播、震度分布、EEW の発報、津波警報などを確認できます。
 
 ---
 
-**最終更新**: 2026年6月12日
+## 操作方法
 
-ご質問やバグ報告は、GitHubのIssueセクションからお願いします。
+| 操作 | 内容 |
+| --- | --- |
+| ← / → | マグニチュード（M1〜M12） |
+| ↑ / ↓ | 震源の深さ（0〜1000km） |
+| Q / W | 発生タイミング（0〜300秒） |
+| A | 地震イベント開始を主要動到達に合わせる |
+| スペース / 開始ボタン | シミュレーション開始 |
+| マウスホイール | 地図ズーム |
+| R | カメラリセット |
+
+## 画面構成
+
+- 地図と観測点、情報パネル、左上の緊急地震速報（EEW）パネルで構成されます。
+- 画面左下の設定パネルで規模・深さ・タイミングを調整します。
+  - シミュレーション開始と同時に設定パネルは隠れます。
+  - 再度調整するときは左下の「設定」を押すと表示されます。右上の「×」で閉じられます。
+  - パネル上部に震央と経過秒数を表示します。
+- EEW 発表中は、推定震央が左上の EEW パネルに表示されます。
+- 停止すると設定パネルが戻ります。
+
+## 主な機能
+
+- 規模・深さ・発生タイミングのリアルタイム調整（M1〜M12 / 0〜1000km / 0〜300秒）
+- P波・S波の伝播と到達時刻の計算
+- 観測点ごとの震度推定と震度分布の表示
+- 緊急地震速報（EEW）の推定震源・予想最大震度
+- 津波警報・津波予報のシミュレーション
+- 読み上げ・効果音
+
+## デプロイ
+
+### Cloudflare Pages
+
+1. リポジトリを fork / clone する
+   ```
+   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   ```
+2. Cloudflare Pages で「Create a project」→「Connect to Git」からこのリポジトリを選択する
+3. ビルド設定
+   - Build command: なし
+   - Build output directory: `/`
+   - Environment variables: なし
+4. 「Save and Deploy」で公開する
+
+### ローカルでの確認
+
+`index.html` を直接開くと `fetch` がブロックされ、プロジェクトデータ（`quake-sim-data.bin`）を読み込めません。必ず HTTP サーバー経由で開いてください。
+
+```
+python -m http.server 8000
+```
+
+ブラウザで `http://localhost:8000` を開きます。
+
+## ファイル構成
+
+| ファイル | 内容 |
+| --- | --- |
+| `index.html` | 起動画面・ローダー・操作パネル（HTML側のUI） |
+| `quake-sim-data.bin` | 実行時に読み込むプロジェクト本体（zip: `project.json` とアセット） |
+| `project.json` | プロジェクト本体の単体コピー（実行時は `quake-sim-data.bin` を使用） |
+| `CNAME` | 公開ドメイン設定 |
+
+## 注意事項
+
+- 地震・津波のシミュレーションは簡略化した計算を用いており、実際の現象とは異なります。
+- 音声（読み上げ・効果音）が含まれます。音量に注意してください。
+- ブラウザの設定によっては一部機能が制限される場合があります。
+
+## ライセンス
+
+- TurboWarp Packager: Mozilla Public License 2.0
+- Scratch: MIT License
+- 本プロジェクト: 改善版として配布
+
+## 参考
+
+- TurboWarp: https://turbowarp.org
+- 元プロジェクト: https://turbowarp.org/1220818872
+- Scratch: https://scratch.mit.edu
+- Cloudflare Pages: https://developers.cloudflare.com/pages/
+
+## クレジット
+
+- 元プロジェクト作成者: TurboWarp / Scratch コミュニティ
+- UI 調整・改修: walbcglgh
+
+最終更新: 2026年9月
 
 ---
 
 # 強震監視器風地震模擬器
 
-一個用來視覺化展示日本地震資訊的網頁應用程式。使用TurboWarp實作的地震模擬器，能夠學習強震監測的即時地震資訊表現方式。
-
-## 🎮 使用方法
-
-### 鍵盤操作
-- **← / →**: 調整地震規模（芮氏規模）(M0～M12)
-- **↑ / ↓**: 調整震源深度 (0～1000km)
-- **Q / W**: 調整發生時間 (0～300秒)
-- **A**: 同步地震事件的開始與主要震波到達
-- **空白鍵** 或 **Start按鈕**: 開始模擬
-- **滑鼠滾輪**: 地圖縮放
-- **R**: 重置相機
-
-### 功能
-- 📊 即時調整地震規模、深度、發生時間
-- 🗺️ 展示日本全國地震資訊
-- 🌊 海嘯警報模擬
-- 🔊 聲音警報功能
-- 📈 即時顯示震度分佈
-- 💾 詳細的地震事件資訊顯示
-
-## ⚙️ UI改善內容
-
-### v2.0 更新
-- **滑桿美化**: 改用漸層橙色設計
-  - 滑鼠懸停時放大1.2倍
-  - 發光效果使視覺更加吸引人
-  
-- **震央選擇按鈕改善**: 立體漸層設計
-  - 懸停時縮放1.05倍
-  - 更亮麗的發光效果
-  
-- **參數範圍擴展**
-  - 規模: M0～M12支援
-  - 深度: 0～1000km支援
-  - 發生時間: 0～300秒支援
-
-## 🚀 部署方法
-
-### Cloudflare Pages 部署
-
-1. **Fork/Clone 倉庫**
-   ```bash
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
-   cd JapanEewSimulator
-   ```
-
-2. **連接到 Cloudflare Pages**
-   - 進入 [Cloudflare Pages 儀表板](https://dash.cloudflare.com/)
-   - 點擊 "Create a project" → "Connect to Git"
-   - 連接 GitHub 帳戶
-   - 選擇此倉庫
-
-3. **建置設定**
-   - Build command: 無（直接使用）
-   - Build output directory: `/` （根資料夾）
-   - Environment variables: 無需設定
-
-4. **執行部署**
-   - 點擊 "Save and Deploy"
-   - 等待部署完成（通常2～3分鐘）
-   - 可使用自動分配的URL訪問
-
-### 本地伺服器測試
-```bash
-# 使用 Python 3
-python -m http.server 8000
-
-# 或使用 Node.js
-npx http-server
-```
-
-在瀏覽器中訪問 `http://localhost:8000`
-
-## 📱 效能最佳化
-
-- **減輕客戶端負荷**: 透過Cloudflare Pages託管，複雜計算在邊緣伺服器處理
-- **行動裝置相容**: 響應式設計支援所有裝置
-- **快速載入**: 透過CDN在全球範圍內快速配送
-
-**建議環境:**
-- Chrome/Edge/Firefox 最新版本
-- 記憶體: 512MB以上推薦
-- 網際網路速度: 10Mbps以上推薦
-
-## ⚠️ 注意事項
-
-- 地震與海嘯模擬採用簡化或自訂公式，與實際現象可能不同
-- 包含聲音警報功能，請注意音量調整
-- 某些瀏覽器安全設定可能限制部分功能
-
-## 📄 授權
-
-- **TurboWarp Packager**: Mozilla Public License 2.0
-- **Scratch**: MIT License
-- **本專案**: 以改善版本發佈
-
-詳細資訊請參閱各檔案的授權標示。
-
-## 🔗 參考連結
-
-- [TurboWarp - Scratch 加速器](https://turbowarp.org)
-- [TurboWarp 原始專案](https://turbowarp.org/1220818872)
-- [Scratch 官方網站](https://scratch.mit.edu)
-- [Cloudflare Pages 文件](https://developers.cloudflare.com/pages/)
-
-## 👤 致謝
-
-- 原始專案作者: TurboWarp/Scratch 社群
-- UI改善版本: walbcglgh (2026)
+以 TurboWarp（Scratch）製作、面向日本地震與緊急地震速報（EEW）的模擬器。可調整震源、規模、深度與發生時間，觀察 P 波／S 波傳播、震度分布、EEW 發布與海嘯警報等。
 
 ---
 
-**最後更新**: 2026年6月12日
+## 操作方式
 
-如有問題或錯誤報告，請使用 GitHub Issues 回報。
+| 操作 | 內容 |
+| --- | --- |
+| ← / → | 調整地震規模（M1〜M12） |
+| ↑ / ↓ | 調整震源深度（0〜1000km） |
+| Q / W | 調整發生時間（0〜300 秒） |
+| A | 讓地震事件開始與主要波到達同步 |
+| 空白鍵 / 開始按鈕 | 開始模擬 |
+| 滑鼠滾輪 | 地圖縮放 |
+| R | 重設相機 |
+
+## 畫面說明
+
+- 由地圖與測站、資訊面板，以及左上方的緊急地震速報（EEW）面板組成。
+- 左下角設定面板可調整規模、深度與發生時間。
+  - 開始模擬時設定面板會自動隱藏。
+  - 需要再調整時，點左下角「設定」即可展開；按右上角「×」收起。
+  - 面板上方顯示震央與經過秒數。
+- EEW 發布期間，預估震央會顯示在左上方的 EEW 面板。
+- 按停止後，設定面板會回來。
+
+## 主要功能
+
+- 即時調整規模、深度與發生時間（M1〜M12 / 0〜1000km / 0〜300 秒）
+- P 波、S 波傳播與到達時刻計算
+- 各測站震度估算與震度分布顯示
+- 緊急地震速報（EEW）的推定震源與預估最大震度
+- 海嘯警報與海嘯預報模擬
+- 語音朗讀與音效
+
+## 部署
+
+### Cloudflare Pages
+
+1. Fork / clone 本倉庫
+   ```
+   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   ```
+2. 在 Cloudflare Pages 點「Create a project」→「Connect to Git」，選擇本倉庫
+3. 建置設定
+   - Build command: 無
+   - Build output directory: `/`
+   - Environment variables: 無
+4. 點「Save and Deploy」發布
+
+### 本機測試
+
+直接用瀏覽器開啟 `index.html` 會被 `fetch` 限制，無法載入專案資料（`quake-sim-data.bin`）。請務必透過 HTTP 伺服器開啟。
+
+```
+python -m http.server 8000
+```
+
+瀏覽器開 `http://localhost:8000`。
+
+## 檔案結構
+
+| 檔案 | 內容 |
+| --- | --- |
+| `index.html` | 啟動畫面、載入器與操作面板（HTML 端 UI） |
+| `quake-sim-data.bin` | 執行時載入的專案本體（zip：內含 `project.json` 與素材） |
+| `project.json` | 專案本體的單獨複本（執行時使用 `quake-sim-data.bin`） |
+| `CNAME` | 公開網域設定 |
+
+## 注意事項
+
+- 地震與海嘯模擬採用簡化計算，與實際現象不同。
+- 含語音（朗讀與音效），請注意音量。
+- 依瀏覽器設定，部分功能可能受限。
+
+## 授權
+
+- TurboWarp Packager: Mozilla Public License 2.0
+- Scratch: MIT License
+- 本專案: 以改善版本發布
+
+## 參考
+
+- TurboWarp: https://turbowarp.org
+- 原始專案: https://turbowarp.org/1220818872
+- Scratch: https://scratch.mit.edu
+- Cloudflare Pages: https://developers.cloudflare.com/pages/
+
+## 致謝
+
+- 原始專案作者: TurboWarp / Scratch 社群
+- UI 調整與改修: walbcglgh
+
+最後更新: 2026 年 9 月
 
 ---
 
 # Japan Earthquake Simulator (Kyou-shin Monitor Style)
 
-A web application that visually simulates Japanese earthquake information. This Scratch-based simulator powered by TurboWarp helps you understand how real-time earthquake alerts and seismic intensity distributions are created and displayed.
-
-## 🎮 How to Use
-
-### Keyboard Controls
-- **← / →**: Adjust earthquake magnitude (M0～M12)
-- **↑ / ↓**: Adjust epicenter depth (0～1000km)
-- **Q / W**: Adjust occurrence time (0～300 seconds)
-- **A**: Sync earthquake event start with the arrival of the main seismic wave
-- **Space Bar** or **Start Button**: Begin simulation
-- **Mouse Wheel**: Zoom map
-- **R**: Reset camera
-
-### Features
-- 📊 Real-time adjustment of earthquake magnitude, depth, and time
-- 🗺️ Display earthquake information across Japan
-- 🌊 Tsunami warning simulation
-- 🔊 Sound alert functionality
-- 📈 Real-time seismic intensity distribution display
-- 💾 Detailed earthquake event information
-
-## ⚙️ UI Improvements
-
-### v2.0 Updates
-- **Enhanced Sliders**: Gradient orange design
-  - Expands to 1.2x on hover
-  - Glowing effect for better visuals
-  
-- **Improved Epicenter Selector**: 3D gradient design
-  - Scales to 1.05x on hover
-  - Brighter glowing effects
-  
-- **Expanded Parameter Ranges**
-  - Magnitude: M0～M12 supported
-  - Depth: 0～1000km supported
-  - Occurrence time: 0～300 seconds supported
-
-## 🚀 Deployment Guide
-
-### Deploy to Cloudflare Pages
-
-1. **Fork/Clone the Repository**
-   ```bash
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
-   cd JapanEewSimulator
-   ```
-
-2. **Connect to Cloudflare Pages**
-   - Visit [Cloudflare Pages Dashboard](https://dash.cloudflare.com/)
-   - Click "Create a project" → "Connect to Git"
-   - Connect your GitHub account
-   - Select this repository
-
-3. **Build Configuration**
-   - Build command: None (use as-is)
-   - Build output directory: `/` (root folder)
-   - Environment variables: Not required
-
-4. **Deploy**
-   - Click "Save and Deploy"
-   - Wait for deployment to complete (usually 2～3 minutes)
-   - Access via the automatically assigned URL
-
-### Local Testing
-```bash
-# Using Python 3
-python -m http.server 8000
-
-# Or using Node.js
-npx http-server
-```
-
-Visit `http://localhost:8000` in your browser
-
-## 📱 Performance Optimization
-
-- **Reduced Client Load**: Hosting on Cloudflare Pages processes complex computations on edge servers
-- **Mobile Compatible**: Responsive design supports all devices
-- **Fast Delivery**: Global CDN ensures fast loading worldwide
-
-**Recommended Environment:**
-- Chrome/Edge/Firefox latest version
-- Memory: 512MB or more recommended
-- Internet speed: 10Mbps or faster recommended
-
-## ⚠️ Disclaimer
-
-- The earthquake and tsunami simulations use simplified or custom formulas and may differ from real phenomena
-- Sound alerts are included; please adjust volume accordingly
-- Some browser security settings may restrict certain features
-
-## 📄 License
-
-- **TurboWarp Packager**: Mozilla Public License 2.0
-- **Scratch**: MIT License
-- **This Project**: Distributed as an improved version
-
-See license notices in respective files for details.
-
-## 🔗 References
-
-- [TurboWarp - Scratch Accelerator](https://turbowarp.org)
-- [Original TurboWarp Project](https://turbowarp.org/1220818872)
-- [Scratch Official Site](https://scratch.mit.edu)
-- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
-
-## 👤 Credits
-
-- Original Project Creator: TurboWarp/Scratch Community
-- UI Enhancement Version: walbcglgh (2026)
+A Japan-focused earthquake and Earthquake Early Warning (EEW) simulator built with TurboWarp (Scratch). You can change the hypocenter, magnitude, depth and timing, and observe P/S wave propagation, seismic intensity distribution, EEW issuance and tsunami warnings.
 
 ---
 
-**Last Updated**: June 12, 2026
+## Controls
 
-For questions or bug reports, please use GitHub Issues.
+| Input | Action |
+| --- | --- |
+| Left / Right | Magnitude (M1–M12) |
+| Up / Down | Hypocenter depth (0–1000 km) |
+| Q / W | Occurrence time (0–300 s) |
+| A | Sync the earthquake event with main-wave arrival |
+| Space / Start button | Start the simulation |
+| Mouse wheel | Zoom the map |
+| R | Reset the camera |
+
+## Screen Layout
+
+- The screen consists of the map with stations, an information panel, and the EEW panel in the top-left.
+- The settings panel in the bottom-left adjusts magnitude, depth and timing.
+  - The settings panel hides automatically when the simulation starts.
+  - To adjust again, click "設定" in the bottom-left to reopen it; click "×" in the top-right to close it.
+  - The top of the panel shows the epicenter and elapsed seconds.
+- While an EEW is active, the estimated epicenter is shown in the top-left EEW panel.
+- Pressing Stop brings the settings panel back.
+
+## Features
+
+- Real-time adjustment of magnitude, depth and occurrence time (M1–M12 / 0–1000 km / 0–300 s)
+- P-wave and S-wave propagation and arrival-time calculation
+- Per-station intensity estimation and intensity distribution display
+- EEW estimated hypocenter and predicted maximum intensity
+- Tsunami warning / advisory simulation
+- Speech readout and sound effects
+
+## Deployment
+
+### Cloudflare Pages
+
+1. Fork / clone the repository
+   ```
+   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   ```
+2. In Cloudflare Pages, click "Create a project" → "Connect to Git" and select this repository
+3. Build configuration
+   - Build command: none
+   - Build output directory: `/`
+   - Environment variables: none
+4. Click "Save and Deploy"
+
+### Local Testing
+
+Opening `index.html` directly is blocked by `fetch`, so the project data (`quake-sim-data.bin`) cannot be loaded. Always open it through an HTTP server.
+
+```
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000`.
+
+## Files
+
+| File | Description |
+| --- | --- |
+| `index.html` | Launch screen, loader and control panel (HTML-side UI) |
+| `quake-sim-data.bin` | Project loaded at runtime (zip: `project.json` plus assets) |
+| `project.json` | Standalone copy of the project (runtime uses `quake-sim-data.bin`) |
+| `CNAME` | Public domain setting |
+
+## Disclaimer
+
+- The earthquake and tsunami simulations use simplified calculations and differ from real phenomena.
+- Speech readout and sound effects are included; mind the volume.
+- Some features may be restricted depending on browser settings.
+
+## License
+
+- TurboWarp Packager: Mozilla Public License 2.0
+- Scratch: MIT License
+- This project: distributed as an improved version
+
+## References
+
+- TurboWarp: https://turbowarp.org
+- Original project: https://turbowarp.org/1220818872
+- Scratch: https://scratch.mit.edu
+- Cloudflare Pages: https://developers.cloudflare.com/pages/
+
+## Credits
+
+- Original project author: TurboWarp / Scratch community
+- UI adjustments and revisions: walbcglgh
+
+Last updated: September 2026
