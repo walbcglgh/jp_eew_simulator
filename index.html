@@ -10,7 +10,7 @@
   <style>
     body {
       color: #ffffff;
-      font-family: sans-serif;
+      font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -49,53 +49,46 @@
       background-color: #000000;
     }
     #launch {
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: #000000;
       cursor: pointer;
     }
     .launch-title {
       font-size: 20px;
-      margin: 0 0 32px;
-      letter-spacing: 0.1em;
-      color: #e8f7ff;
-      text-shadow: 0 0 14px rgba(0, 200, 255, 0.55);
+      font-weight: 500;
+      margin: 0 0 36px;
+      color: #f2f2f2;
     }
     .launch-button {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: rgba(0, 200, 255, 0.06);
-      border: 2px solid rgba(0, 200, 255, 0.85);
-      display: flex;
+      min-width: 160px;
+      padding: 12px 32px;
+      border-radius: 4px;
+      background: transparent;
+      border: 1px solid #6b6b6b;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-      animation: launch-pulse 2s ease-in-out infinite;
+      color: #f2f2f2;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
     }
-    .launch-button svg {
-      margin-left: 6px;
-    }
-    @keyframes launch-pulse {
-      0%, 100% { box-shadow: 0 0 14px rgba(0, 200, 255, 0.25), inset 0 0 10px rgba(0, 200, 255, 0.1); transform: scale(1); }
-      50% { box-shadow: 0 0 36px rgba(0, 200, 255, 0.6), inset 0 0 20px rgba(0, 200, 255, 0.25); transform: scale(1.06); }
+    .launch-button:hover {
+      background: #1c1c1c;
+      border-color: #9a9a9a;
     }
     .launch-hint {
-      margin-top: 28px;
-      font-size: 13px;
-      color: rgba(232, 247, 255, 0.7);
-      letter-spacing: 0.25em;
-      animation: hint-blink 1.6s ease-in-out infinite;
-    }
-    @keyframes hint-blink {
-      0%, 100% { opacity: 0.35; }
-      50% { opacity: 1; }
+      margin-top: 24px;
+      font-size: 12px;
+      color: #8a8a8a;
     }
     #loading {
       
     }
     .spinner {
       position: relative;
-      width: 96px;
-      height: 96px;
+      width: 44px;
+      height: 44px;
     }
     .spinner > svg {
       width: 100%;
@@ -104,38 +97,22 @@
     }
     .spinner-track {
       fill: none;
-      stroke: rgba(255, 255, 255, 0.12);
-      stroke-width: 6;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 2;
     }
     .spinner-value {
       fill: none;
-      stroke: #00c8ff;
-      stroke-width: 6;
+      stroke: rgba(255, 255, 255, 0.85);
+      stroke-width: 2;
       stroke-linecap: round;
       stroke-dasharray: 263.9;
       stroke-dashoffset: 263.9;
-      transition: stroke-dashoffset 0.2s ease-out;
-      filter: drop-shadow(0 0 6px rgba(0, 200, 255, 0.7));
-    }
-    .spinner-spin {
-      position: absolute;
-      inset: -12px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      border-top-color: rgba(0, 200, 255, 0.55);
-      animation: spinner-rotate 1s linear infinite;
-    }
-    @keyframes spinner-rotate {
-      to { transform: rotate(360deg); }
+      transition: stroke-dashoffset 0.3s ease;
     }
     .spinner-percent {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      color: #e8f7ff;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #8a8a8a;
       font-variant-numeric: tabular-nums;
     }
     noscript {
@@ -211,24 +188,19 @@
 
   <div id="launch" class="screen" hidden title="Click to start">
     <h1 class="launch-title">強震モニタ風地震シミュレーション</h1>
-    <div class="launch-button">
-      <svg viewBox="0 0 24 24" width="40" height="40" fill="#00c8ff" aria-hidden="true">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-    </div>
-    <div class="launch-hint">クリックでスタート</div>
+    <div class="launch-button">スタート</div>
+    <div class="launch-hint">クリックして開始</div>
   </div>
 
   <div id="loading" class="screen">
     <noscript>Enable JavaScript</noscript>
     <div class="spinner">
-      <div class="spinner-spin"></div>
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <circle class="spinner-track" cx="50" cy="50" r="42"></circle>
         <circle class="spinner-value" id="loading-ring" cx="50" cy="50" r="42"></circle>
       </svg>
-      <div class="spinner-percent" id="loading-percent">0%</div>
     </div>
+    <div class="spinner-percent" id="loading-percent">0%</div>
   </div>
 
   <div id="error" class="screen" hidden>
@@ -509,70 +481,106 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </html>
 
 <style id="sim-ui-css">
-.sc-monitor-root { display: none !important; }
 #sim-ctrl-panel {
   position:fixed; left:12px; bottom:12px;
-  background:linear-gradient(160deg,rgba(0,6,16,.95),rgba(0,14,32,.92));
-  border:1px solid rgba(0,200,255,.22); border-radius:12px;
-  padding:10px 14px 13px; min-width:220px; z-index:99999;
-  backdrop-filter:blur(10px);
-  box-shadow:0 0 32px rgba(0,200,255,.07),0 4px 20px rgba(0,0,0,.65);
-  font-family:'Courier New',monospace; color:#e8f7ff;
+  background:#0d0d0d;
+  border:1px solid #333333; border-radius:6px;
+  padding:12px 14px 14px; min-width:220px; z-index:99999;
+  color:#e0e0e0;
+  font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
   user-select:none; display:none;
 }
 #sim-ctrl-panel.visible { display:block; }
 #sim-ctrl-title {
-  font-size:9.5px; letter-spacing:.2em; color:rgba(0,200,255,.55);
-  text-transform:uppercase; margin-bottom:9px; padding-bottom:8px;
-  border-bottom:1px solid rgba(0,200,255,.10);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:11px; color:#9a9a9a;
+  margin-bottom:10px; padding-bottom:8px;
+  border-bottom:1px solid #2a2a2a;
 }
-#sim-btn-row { display:flex; gap:7px; margin-bottom:10px; }
+#sim-ctrl-close {
+  background:none; border:none; padding:0 2px;
+  color:#9a9a9a; font-size:14px; line-height:1; cursor:pointer;
+}
+#sim-ctrl-close:hover { color:#e0e0e0; }
+.sim-info-top {
+  margin:0 0 10px; padding:0 0 8px;
+  border-bottom:1px solid #2a2a2a;
+}
+#sim-ctrl-toggle {
+  position:fixed; left:12px; bottom:12px; display:none;
+  padding:6px 12px; z-index:99999;
+  background:#0d0d0d; border:1px solid #333333; border-radius:6px;
+  color:#9a9a9a;
+  font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  font-size:12px; cursor:pointer; user-select:none;
+}
+#sim-ctrl-toggle:hover { background:#1c1c1c; color:#e0e0e0; }
+#sim-eew-epicenter {
+  position:fixed; left:0; top:0; display:none; z-index:99998;
+  background:#fc662c; color:#ffffff;
+  font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  font-weight:700; line-height:1.2; border-radius:3px;
+  white-space:nowrap; pointer-events:none;
+}
+#sim-btn-row { display:flex; gap:6px; margin-bottom:10px; }
 .sim-btn {
-  flex:1; height:30px; border-radius:7px;
-  border:1px solid rgba(0,200,255,.20); background:rgba(0,200,255,.06);
+  flex:1; height:30px; border-radius:4px;
+  border:1px solid #3a3a3a; background:#1a1a1a;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
-  transition:background .15s,border-color .15s,box-shadow .15s;
+  transition:background .15s,border-color .15s;
   outline:none; padding:0;
 }
-.sim-btn:hover { background:rgba(0,200,255,.14); border-color:rgba(0,200,255,.45); box-shadow:0 0 10px rgba(0,200,255,.2); }
-.sim-btn:active { background:rgba(0,200,255,.22); }
-#sim-btn-stop { border-color:rgba(255,70,70,.22); background:rgba(255,70,70,.06); }
-#sim-btn-stop:hover { background:rgba(255,70,70,.16); border-color:rgba(255,100,100,.5); box-shadow:0 0 10px rgba(255,80,80,.2); }
-#sim-btn-pause.paused { background:rgba(255,200,0,.12); border-color:rgba(255,200,0,.4); }
+.sim-btn:hover { background:#242424; border-color:#555555; }
+.sim-btn:active { background:#2e2e2e; }
+#sim-btn-stop { border-color:#3a3a3a; background:#1a1a1a; }
+#sim-btn-stop:hover { background:#2a1a1a; border-color:#7a3a3a; }
+#sim-btn-pause.paused { background:#2a2410; border-color:#6a5a20; }
 .sim-row { margin:8px 0; }
 .sim-label-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; font-size:10.5px; }
-.sim-label-name { color:rgba(0,200,255,.65); letter-spacing:.04em; }
-.sim-label-val { color:#00c8ff; font-weight:bold; font-size:12.5px; min-width:58px; text-align:right; filter:drop-shadow(0 0 4px rgba(0,200,255,.45)); }
-.sim-slider { -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:2px; background:rgba(0,200,255,.16); outline:none; cursor:pointer; }
-.sim-slider:hover { background:rgba(0,200,255,.26); }
-.sim-slider::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; background:radial-gradient(circle,#fff 28%,#00c8ff 100%); box-shadow:0 0 8px rgba(0,200,255,.9),0 0 2px #fff; cursor:pointer; }
-.sim-slider::-moz-range-thumb { width:15px; height:15px; border-radius:50%; border:none; background:radial-gradient(circle,#fff 28%,#00c8ff 100%); box-shadow:0 0 8px rgba(0,200,255,.9); cursor:pointer; }
+.sim-label-name { color:#9a9a9a; }
+.sim-label-val { color:#e0e0e0; font-weight:600; font-size:12px; min-width:58px; text-align:right; }
+.sim-slider { -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:2px; background:#3a3a3a; outline:none; cursor:pointer; }
+.sim-slider:hover { background:#4a4a4a; }
+.sim-slider::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:#e0e0e0; cursor:pointer; }
+.sim-slider::-moz-range-thumb { width:13px; height:13px; border-radius:50%; border:none; background:#e0e0e0; cursor:pointer; }
 /* epicenter info rows */
 .sim-info-divider {
-  margin-top:10px; padding-top:8px; border-top:1px solid rgba(0,200,255,.10);
+  margin-top:10px; padding-top:8px; border-top:1px solid #2a2a2a;
 }
 .sim-info-row {
   display:flex; align-items:center; gap:6px;
   font-size:10.5px; margin-top:5px;
 }
-.sim-info-label { color:rgba(0,200,255,.55); white-space:nowrap; }
+.sim-info-label { color:#9a9a9a; white-space:nowrap; }
 .sim-info-val {
-  color:#e8f7ff; flex:1; text-align:right;
+  color:#e0e0e0; flex:1; text-align:right;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   font-size:10.5px;
 }
 .sim-info-val.highlight {
-  color:#ffd700; font-weight:bold;
-  filter:drop-shadow(0 0 4px rgba(255,215,0,.45));
+  color:#e0e0e0; font-weight:600;
 }
 </style>
 
 <div id="sim-ctrl-panel">
-  <div id="sim-ctrl-title">&#9656; シミュレーション設定</div>
+  <div id="sim-ctrl-title">
+    <span>シミュレーション設定</span>
+    <button id="sim-ctrl-close" title="閉じる">&times;</button>
+  </div>
+  <div class="sim-info-top">
+    <div class="sim-info-row">
+      <span class="sim-info-label">震央</span>
+      <span class="sim-info-val highlight" id="sim-epicenter-val">&#8212;</span>
+    </div>
+    <div class="sim-info-row">
+      <span class="sim-info-label">発生後</span>
+      <span class="sim-info-val" id="sim-elapsed-val">&#8212;</span>
+    </div>
+  </div>
   <div id="sim-btn-row">
-    <button class="sim-btn" id="sim-btn-flag"  title="リスタート"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4dffb4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 3l13 5-13 5"/></svg></button>
-    <button class="sim-btn" id="sim-btn-pause" title="一時停止 / 再開"><svg width="14" height="14" viewBox="0 0 24 24" fill="#00c8ff"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg></button>
-    <button class="sim-btn" id="sim-btn-stop"  title="ストップ"><svg width="14" height="14" viewBox="0 0 24 24" fill="#ff5555"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+    <button class="sim-btn" id="sim-btn-flag"  title="リスタート"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 3l13 5-13 5"/></svg></button>
+    <button class="sim-btn" id="sim-btn-pause" title="一時停止 / 再開"><svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg></button>
+    <button class="sim-btn" id="sim-btn-stop"  title="ストップ"><svg width="14" height="14" viewBox="0 0 24 24" fill="#c96a6a"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
   </div>
   <div class="sim-row">
     <div class="sim-label-row"><span class="sim-label-name">マグニチュード</span><span class="sim-label-val" id="sim-val-m">M 5.0</span></div>
@@ -586,22 +594,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="sim-label-row"><span class="sim-label-name">発生タイミング</span><span class="sim-label-val" id="sim-val-t">0 秒</span></div>
     <input class="sim-slider" id="sim-slide-t" type="range" min="0" max="300" step="1" value="0">
   </div>
-  <div class="sim-info-divider">
-    <div class="sim-info-row">
-      <span class="sim-info-label">&#128205; 震央</span>
-      <span class="sim-info-val highlight" id="sim-epicenter-val">&#8212;</span>
-    </div>
-    <div class="sim-info-row">
-      <span class="sim-info-label">&#8987; 発生後</span>
-      <span class="sim-info-val" id="sim-elapsed-val">&#8212;</span>
-    </div>
-  </div>
 </div>
+<div id="sim-ctrl-toggle" title="設定">設定</div>
+<div id="sim-eew-epicenter"></div>
 
 <script id="sim-ui-js">
 (function() {
-  var PAUSE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#00c8ff"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg>';
-  var PLAY_ICON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#ffd700"><path d="M8 5v14l11-7z"/></svg>';
+  var PAUSE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg>';
+  var PLAY_ICON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><path d="M8 5v14l11-7z"/></svg>';
   var panel    = document.getElementById('sim-ctrl-panel');
   var slideM   = document.getElementById('sim-slide-m');
   var slideD   = document.getElementById('sim-slide-d');
@@ -614,7 +614,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   var btnFlag  = document.getElementById('sim-btn-flag');
   var btnPause = document.getElementById('sim-btn-pause');
   var btnStop  = document.getElementById('sim-btn-stop');
+  var toggle   = document.getElementById('sim-ctrl-toggle');
+  var closeBtn = document.getElementById('sim-ctrl-close');
+  var eewOverlay = document.getElementById('sim-eew-epicenter');
   var paused   = false;
+
+  function showPanel() { panel.classList.add('visible'); if(toggle) toggle.style.display='none'; }
+  function hidePanel() { panel.classList.remove('visible'); if(toggle) toggle.style.display='block'; }
 
   /* ── Variable IDs (Stage) ───────────────────────────────── */
   var VID = {
@@ -623,7 +629,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     t:   'DW4X1FGN37FrQHyx3OeU',   /* スタート後発生秒数         */
     ep1: 'NV0uo4Qny3UvZfEZ8yzZ',   /* 実際の震源用震源           */
     ep2: 'Bv3Xntvj12NnJ5PlWGXr',   /* 震源 (緊急地震速報旁の震央) */
-    ela: 'DW4X1FGN37FrQHyx3OeU'    /* 発生後経過秒 (same as t if no dedicated var) */
+    ela: 'DW4X1FGN37FrQHyx3OeU',   /* 発生後経過秒 (same as t if no dedicated var) */
+    eew: 'cLEXs9QENRoExzadot96'    /* EEW全体で発表中？  (0=off, 1/2=active) */
   };
   /* List IDs */
   var LID = { epicenter:'w6RbQi2ENF9PN18vXYUF', jma:'3OYPeliWyrC0Z5qC2xvI' };
@@ -652,6 +659,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   btnFlag.addEventListener('click', function() {
     if(paused) resume();
     if(window.vm) window.vm.greenFlag();
+    hidePanel();
   });
   btnPause.addEventListener('click', function() {
     if(!window.vm) return;
@@ -661,7 +669,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(!window.vm) return;
     if(paused) resume();
     window.vm.stopAll();
+    showPanel();
   });
+  if(toggle) toggle.addEventListener('click', showPanel);
+  if(closeBtn) closeBtn.addEventListener('click', hidePanel);
 
   function pause() {
     try{ if(window.vm.runtime.pause) window.vm.runtime.pause(); }catch(e){}
@@ -701,6 +712,29 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     });
   }
 
+  /* Estimated epicenter overlay: shown only while an EEW is active. */
+  function updateEEWOverlay() {
+    if (!eewOverlay) return;
+    var active = Number(getVar(VID.eew)) > 0;
+    var txt = getVar(VID.ep2);
+    if (txt === null || txt === undefined || String(txt).trim() === '') txt = getVar(VID.ep1);
+    if (!active || txt === null || txt === undefined || String(txt).trim() === '') {
+      eewOverlay.style.display = 'none';
+      return;
+    }
+    var canvas = document.querySelector('.sc-canvas') || document.querySelector('canvas');
+    if (!canvas) { eewOverlay.style.display = 'none'; return; }
+    var r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) { eewOverlay.style.display = 'none'; return; }
+    var s = r.width / 480;
+    eewOverlay.textContent = String(txt);
+    eewOverlay.style.left = (r.left + 43 * s) + 'px';
+    eewOverlay.style.top = (r.top + 11 * s) + 'px';
+    eewOverlay.style.fontSize = (16 * s) + 'px';
+    eewOverlay.style.padding = (2 * s) + 'px ' + (6 * s) + 'px';
+    eewOverlay.style.display = 'block';
+  }
+
   function fixJMA() {
     var s=stage(); if(!s) return;
     var el=s.variables[LID.epicenter], jl=s.variables[LID.jma];
@@ -712,9 +746,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   function init() {
     if(!window.vm||!window.vm.runtime||!window.vm.runtime.targets||window.vm.runtime.targets.length<2)
       return setTimeout(init, 300);
-    panel.classList.add('visible');
+    showPanel();
     pullVars();
-    setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); }, 200);
+    updateEEWOverlay();
+    setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); }, 200);
+    window.addEventListener('resize', updateEEWOverlay);
   }
 
   new MutationObserver(hideMonitors).observe(document.body, {childList:true, subtree:true});
