@@ -353,7 +353,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       };
       let projectDecodeBuffer = null;
       let projectDecodeIndex = 0;
-      const projectFetchPromise = fetch('quake-sim-data.bin').then((r) => {
+      const projectFetchPromise = fetch('quake-sim-data.bin?v=' + Date.now()).then((r) => {
         if (!r.ok) throw new Error('Failed to load project data: ' + r.status);
         return r.arrayBuffer();
       });
