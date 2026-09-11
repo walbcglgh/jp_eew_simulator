@@ -145,13 +145,16 @@
       border-radius: 4px;
     }
     .control-button-highlight:hover {
-      background: #ff4c4c26;
+      background: rgba(255, 255, 255, 0.10);
     }
     .control-button-highlight.active {
-      background: #ff4c4c59;
+      background: rgba(255, 255, 255, 0.20);
     }
     .fullscreen-button {
-      background: white;
+      background: #1a1a1a;
+    }
+    .fullscreen-button svg, .fullscreen-button img {
+      filter: invert(1) brightness(1.6);
     }
     .standalone-fullscreen-button {
       position: absolute;
