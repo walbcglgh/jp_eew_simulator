@@ -686,16 +686,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     paused=false; btnPause.innerHTML=PAUSE_ICON; btnPause.classList.remove('paused');
   }
 
+  function numOr(v, fallback) {
+    var n = parseFloat(v);
+    return isFinite(n) ? n : fallback;
+  }
+
   function pullVars() {
     var s = stage(); if(!s) return;
 
     /* sliders – only update when not actively dragging */
     if(document.activeElement!==slideM && s.variables[VID.m])
-      slideM.value = Math.min(12, Math.max(1, parseFloat(s.variables[VID.m].value)||5));
+      slideM.value = Math.min(12, Math.max(1, numOr(s.variables[VID.m].value, 5)));
     if(document.activeElement!==slideD && s.variables[VID.d])
-      slideD.value = Math.min(1000, Math.max(0, parseInt(s.variables[VID.d].value)||10));
+      slideD.value = Math.min(1000, Math.max(0, numOr(s.variables[VID.d].value, 10)));
     if(document.activeElement!==slideT && s.variables[VID.t])
-      slideT.value = Math.min(300, Math.max(0, parseInt(s.variables[VID.t].value)||0));
+      slideT.value = Math.min(300, Math.max(0, numOr(s.variables[VID.t].value, 0)));
     syncLabels();
 
     /* 震央 – try ep2 (震源) first, fall back to ep1 */
