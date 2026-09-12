@@ -79,6 +79,7 @@ python -m http.server 8000
 
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
+- Zen Maru Gothic（フォント）: SIL Open Font License 1.1
 - 本プロジェクト: 改善版として配布
 
 ## 参考
@@ -92,6 +93,7 @@ python -m http.server 8000
 
 - 元プロジェクト作成者: TurboWarp / Scratch コミュニティ
 - UI 調整・改修: walbcglgh
+- フォント: Zen Maru Gothic（Yoshimichi Ohira）
 
 最終更新: 2026年9月
 
@@ -178,6 +180,7 @@ python -m http.server 8000
 
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
+- Zen Maru Gothic（字型）: SIL Open Font License 1.1
 - 本專案: 以改善版本發布
 
 ## 參考
@@ -191,6 +194,7 @@ python -m http.server 8000
 
 - 原始專案作者: TurboWarp / Scratch 社群
 - UI 調整與改修: walbcglgh
+- 字型: Zen Maru Gothic（Yoshimichi Ohira）
 
 最後更新: 2026 年 9 月
 
@@ -277,6 +281,7 @@ Then open `http://localhost:8000`.
 
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
+- Zen Maru Gothic (font): SIL Open Font License 1.1
 - This project: distributed as an improved version
 
 ## References
@@ -290,5 +295,6 @@ Then open `http://localhost:8000`.
 
 - Original project author: TurboWarp / Scratch community
 - UI adjustments and revisions: walbcglgh
+- Font: Zen Maru Gothic (Yoshimichi Ohira)
 
 Last updated: September 2026
