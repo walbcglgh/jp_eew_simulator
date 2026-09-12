@@ -85,6 +85,47 @@
       font-size: 12px;
       color: #8a8a8a;
     }
+    .launch-github {
+      margin-top: 18px;
+      padding: 8px 20px;
+      border-radius: 4px;
+      border: 1px solid #3a3a3a;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 13px;
+      text-decoration: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .launch-github:hover {
+      background-color: #242424;
+      border-color: #555555;
+    }
+    .launch-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .launch-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: contain;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.15s ease;
+    }
+    .launch-footer a:hover .launch-logo {
+      opacity: 1;
+    }
+    .launch-powered {
+      font-size: 11px;
+      color: #8a8a8a;
+    }
     #loading {
       
     }
@@ -196,6 +237,13 @@
     <h1 class="launch-title">強震モニタ風地震シミュレーション</h1>
     <div class="launch-button">スタート</div>
     <div class="launch-hint">クリックして開始</div>
+    <a class="launch-github" href="https://github.com/walbcglgh/jp_eew_simulator" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">GitHub リポジトリ</a>
+    <div class="launch-footer">
+      <a href="https://tdn.fj.kg" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+        <img class="launch-logo" src="images/logo.jpg" alt="TDN Studio">
+      </a>
+      <div class="launch-powered">Powered By TDN Studio</div>
+    </div>
   </div>
 
   <div id="loading" class="screen">
