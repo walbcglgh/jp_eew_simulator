@@ -16,6 +16,13 @@ TurboWarp（Scratch）で動作する、日本向けの地震・緊急地震速�
 | マウスホイール | 地図ズーム |
 | R | カメラリセット |
 
+### タッチ操作（スマートフォン・タブレット）
+
+- 左下のスライダーを指でドラッグして、マグニチュード・深さ・発生タイミングを調整します。
+- 左下の「設定」で設定パネルを開き、右上の「×」で閉じます。
+- ボタンで開始（やり直し）・一時停止／再開・ストップを操作できます。
+- 地図はドラッグで拡大・縮小できます。
+
 ## 画面構成
 
 - 地図と観測点、情報パネル、左上の緊急地震速報（EEW）パネルで構成されます。
@@ -41,7 +48,7 @@ TurboWarp（Scratch）で動作する、日本向けの地震・緊急地震速�
 
 1. リポジトリを fork / clone する
    ```
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   git clone https://github.com/walbcglgh/jp_eew_simulator.git
    ```
 2. Cloudflare Pages で「Create a project」→「Connect to Git」からこのリポジトリを選択する
 3. ビルド設定
@@ -67,7 +74,6 @@ python -m http.server 8000
 | `index.html` | 起動画面・ローダー・操作パネル（HTML側のUI） |
 | `quake-sim-data.bin` | 実行時に読み込むプロジェクト本体（zip: `project.json` とアセット） |
 | `project.json` | プロジェクト本体の単体コピー（実行時は `quake-sim-data.bin` を使用） |
-| `CNAME` | 公開ドメイン設定 |
 
 ## 注意事項
 
@@ -117,6 +123,13 @@ python -m http.server 8000
 | 滑鼠滾輪 | 地圖縮放 |
 | R | 重設相機 |
 
+### 觸控操作（智慧型手機／平板）
+
+- 用手指拖曳左下角的滑桿，調整規模、深度與發生時間。
+- 點左下角「設定」展開設定面板，點右上角「×」收起。
+- 可用按鈕進行重啟（重新開始）、暫停／繼續、停止。
+- 地圖可用拖曳方式縮放。
+
 ## 畫面說明
 
 - 由地圖與測站、資訊面板，以及左上方的緊急地震速報（EEW）面板組成。
@@ -142,7 +155,7 @@ python -m http.server 8000
 
 1. Fork / clone 本倉庫
    ```
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   git clone https://github.com/walbcglgh/jp_eew_simulator.git
    ```
 2. 在 Cloudflare Pages 點「Create a project」→「Connect to Git」，選擇本倉庫
 3. 建置設定
@@ -168,7 +181,6 @@ python -m http.server 8000
 | `index.html` | 啟動畫面、載入器與操作面板（HTML 端 UI） |
 | `quake-sim-data.bin` | 執行時載入的專案本體（zip：內含 `project.json` 與素材） |
 | `project.json` | 專案本體的單獨複本（執行時使用 `quake-sim-data.bin`） |
-| `CNAME` | 公開網域設定 |
 
 ## 注意事項
 
@@ -218,6 +230,13 @@ A Japan-focused earthquake and Earthquake Early Warning (EEW) simulator built wi
 | Mouse wheel | Zoom the map |
 | R | Reset the camera |
 
+### Touch controls (smartphone / tablet)
+
+- Drag the bottom-left sliders with a finger to adjust magnitude, depth and occurrence time.
+- Tap "設定" in the bottom-left to open the settings panel and "×" in the top-right to close it.
+- Use the buttons to restart, pause/resume and stop.
+- The map can be zoomed by dragging.
+
 ## Screen Layout
 
 - The screen consists of the map with stations, an information panel, and the EEW panel in the top-left.
@@ -243,7 +262,7 @@ A Japan-focused earthquake and Earthquake Early Warning (EEW) simulator built wi
 
 1. Fork / clone the repository
    ```
-   git clone https://github.com/walbcglgh/JapanEewSimulator.git
+   git clone https://github.com/walbcglgh/jp_eew_simulator.git
    ```
 2. In Cloudflare Pages, click "Create a project" → "Connect to Git" and select this repository
 3. Build configuration
@@ -269,7 +288,6 @@ Then open `http://localhost:8000`.
 | `index.html` | Launch screen, loader and control panel (HTML-side UI) |
 | `quake-sim-data.bin` | Project loaded at runtime (zip: `project.json` plus assets) |
 | `project.json` | Standalone copy of the project (runtime uses `quake-sim-data.bin`) |
-| `CNAME` | Public domain setting |
 
 ## Disclaimer
 
