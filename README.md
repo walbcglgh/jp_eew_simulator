@@ -12,9 +12,23 @@ TurboWarp（Scratch）で動作する、日本向けの地震・緊急地震速�
 | ↑ / ↓ | 震源の深さ（0〜1000km） |
 | Q / W | 発生タイミング（0〜300秒） |
 | A | 地震イベント開始を主要動到達に合わせる |
-| スペース / 開始ボタン | シミュレーション開始 |
+| スペース / 開始ボタン | シミュレーション開始・一時停止 |
 | マウスホイール | 地図ズーム |
 | R | カメラリセット |
+
+### 設定パネルのショートカット
+
+| キー | 内容 |
+| --- | --- |
+| Enter | リスタート（地震を発生） |
+| C | 設定パネルの開閉 |
+| 1 / 2 / 3 | 地震情報 / EEW / 津波 タブ |
+| ? | 操作方法の表示 |
+| Esc | 操作方法を閉じる |
+
+- 初回起動時に操作方法が自動で表示されます（設定パネルの「?」ボタンでも再表示）。
+- 設定パネル内の「書き出し」でマグニチュード・深さ・タイミングを JSON に保存し、「読み込み」で復元できます。
+- 上記のキーはプロジェクト側（Scratch）のキー操作と重複しないものを選んでいます。
 
 ### タッチ操作（スマートフォン・タブレット）
 
@@ -74,6 +88,8 @@ python -m http.server 8000
 | `index.html` | 起動画面・ローダー・操作パネル（HTML側のUI） |
 | `quake-sim-data.bin` | 実行時に読み込むプロジェクト本体（zip: `project.json` とアセット） |
 | `project.json` | プロジェクト本体の単体コピー（実行時は `quake-sim-data.bin` を使用） |
+| `fonts/` | Zen Maru Gothic のサブセット字型（400 / 500 / 700）と `OFL.txt` |
+| `LICENSE` | 本プロジェクトの変更箇所に適用される Mozilla Public License 2.0 |
 
 ## 注意事項
 
@@ -83,10 +99,11 @@ python -m http.server 8000
 
 ## ライセンス
 
+- 本プロジェクトの変更箇所（`index.html` / `quake-sim-data.bin` / `project.json` / `fonts/`）: Mozilla Public License 2.0（全文は `LICENSE`）
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
-- Zen Maru Gothic（フォント）: SIL Open Font License 1.1
-- 本プロジェクト: 改善版として配布
+- Zen Maru Gothic（フォント）: SIL Open Font License 1.1（`fonts/` にサブセットを同梱、`fonts/OFL.txt` に全文）
+- フォントは外部 CDNs を使わず自前でホストしているため、オフラインでも同一の見た目になります。
 
 ## 参考
 
@@ -119,9 +136,23 @@ python -m http.server 8000
 | ↑ / ↓ | 調整震源深度（0〜1000km） |
 | Q / W | 調整發生時間（0〜300 秒） |
 | A | 讓地震事件開始與主要波到達同步 |
-| 空白鍵 / 開始按鈕 | 開始模擬 |
+| 空白鍵 / 開始按鈕 | 開始模擬、暫停 |
 | 滑鼠滾輪 | 地圖縮放 |
 | R | 重設相機 |
+
+### 設定面板快捷鍵
+
+| 按鍵 | 內容 |
+| --- | --- |
+| Enter | 重啟（發生地震） |
+| C | 開關設定面板 |
+| 1 / 2 / 3 | 地震信息 / EEW / 海嘯 分頁 |
+| ? | 顯示操作說明 |
+| Esc | 關閉操作說明 |
+
+- 首次開啟會自動顯示操作說明（也可按設定面板的「?」再次開啟）。
+- 設定面板的「書き出し」可把規模、深度、發生時間輸出成 JSON，「読み込み」可還原。
+- 上述按鍵已避開專案本身（Scratch）的鍵盤操作。
 
 ### 觸控操作（智慧型手機／平板）
 
@@ -181,6 +212,8 @@ python -m http.server 8000
 | `index.html` | 啟動畫面、載入器與操作面板（HTML 端 UI） |
 | `quake-sim-data.bin` | 執行時載入的專案本體（zip：內含 `project.json` 與素材） |
 | `project.json` | 專案本體的單獨複本（執行時使用 `quake-sim-data.bin`） |
+| `fonts/` | Zen Maru Gothic 子集字型（400 / 500 / 700）與 `OFL.txt` |
+| `LICENSE` | 本專案修改部分適用的 Mozilla Public License 2.0 |
 
 ## 注意事項
 
@@ -190,10 +223,11 @@ python -m http.server 8000
 
 ## 授權
 
+- 本專案的修改部分（`index.html` / `quake-sim-data.bin` / `project.json` / `fonts/`）: Mozilla Public License 2.0（全文見 `LICENSE`）
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
-- Zen Maru Gothic（字型）: SIL Open Font License 1.1
-- 本專案: 以改善版本發布
+- Zen Maru Gothic（字型）: SIL Open Font License 1.1（子集字型收錄於 `fonts/`，全文見 `fonts/OFL.txt`）
+- 字型不使用外部 CDN，而是放在專案內自行提供，離線開啟也能保持相同外觀。
 
 ## 參考
 
@@ -226,9 +260,23 @@ A Japan-focused earthquake and Earthquake Early Warning (EEW) simulator built wi
 | Up / Down | Hypocenter depth (0–1000 km) |
 | Q / W | Occurrence time (0–300 s) |
 | A | Sync the earthquake event with main-wave arrival |
-| Space / Start button | Start the simulation |
+| Space / Start button | Start the simulation, pause/resume |
 | Mouse wheel | Zoom the map |
 | R | Reset the camera |
+
+### Settings panel shortcuts
+
+| Key | Action |
+| --- | --- |
+| Enter | Restart (trigger the earthquake) |
+| C | Open/close the settings panel |
+| 1 / 2 / 3 | 地震情報 / EEW / 津波 tabs |
+| ? | Show the help sheet |
+| Esc | Close the help sheet |
+
+- The help sheet appears automatically on first launch (reopen it with the "?" button in the settings panel).
+- "書き出し" saves magnitude, depth and timing as JSON; "読み込み" restores them.
+- These keys are chosen so they do not overlap the project's own (Scratch) key bindings.
 
 ### Touch controls (smartphone / tablet)
 
@@ -288,6 +336,8 @@ Then open `http://localhost:8000`.
 | `index.html` | Launch screen, loader and control panel (HTML-side UI) |
 | `quake-sim-data.bin` | Project loaded at runtime (zip: `project.json` plus assets) |
 | `project.json` | Standalone copy of the project (runtime uses `quake-sim-data.bin`) |
+| `fonts/` | Zen Maru Gothic subset fonts (400 / 500 / 700) and `OFL.txt` |
+| `LICENSE` | Mozilla Public License 2.0, covering this project's modifications |
 
 ## Disclaimer
 
@@ -297,10 +347,11 @@ Then open `http://localhost:8000`.
 
 ## License
 
+- Modifications made in this project (`index.html` / `quake-sim-data.bin` / `project.json` / `fonts/`): Mozilla Public License 2.0 (full text in `LICENSE`)
 - TurboWarp Packager: Mozilla Public License 2.0
 - Scratch: MIT License
-- Zen Maru Gothic (font): SIL Open Font License 1.1
-- This project: distributed as an improved version
+- Zen Maru Gothic (font): SIL Open Font License 1.1 (subset fonts bundled in `fonts/`, full text in `fonts/OFL.txt`)
+- Fonts are self-hosted in the repository, so the look stays the same offline (no external CDN).
 
 ## References
 

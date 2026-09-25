@@ -8,3 +8,8 @@
 *~
 .DS_Store
 Thumbs.db
+
+# License and bundled fonts must stay tracked
+!LICENSE
+!fonts/
+!fonts/**
