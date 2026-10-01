@@ -956,19 +956,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     var rad = (45 + lat / 2) * Math.PI / 180;
     return Math.log(Math.tan(rad)) * 572.9577951308232 - 374.04780730560344;
   }
-  function focusEpicenter(lat, lon) {
+  var pendingEpicenter = null;
+  function markEpicenter(lat, lon) {
     var s = stage();
-    if(!s) return;
-    var cx = projectX(lon), cy = projectY(lat), zoom = 4;
-    if(s.variables[VID.cx]) s.variables[VID.cx].value = cx;
-    if(s.variables[VID.cy]) s.variables[VID.cy].value = cy;
-    if(s.variables[VID.zoom]) s.variables[VID.zoom].value = zoom;
+    if(!s) return false;
     var list = s.variables[LID.epicenter];
-    if(list && list.value) {
-      while(list.value.length < 7) list.value.push('');
-      list.value[0] = lon;
-      list.value[1] = lat;
-    }
+    if(!list || !list.value) return false;
+    while(list.value.length < 7) list.value.push('');
+    list.value[0] = lon;
+    list.value[1] = lat;
+    list.value[2] = parseInt(slideD.value, 10);
+    list.value[3] = parseFloat(slideM.value);
     if(s.variables[VID.lookX]) s.variables[VID.lookX].value = lon;
     if(s.variables[VID.lookY]) s.variables[VID.lookY].value = lat;
     try {
@@ -978,6 +976,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         });
       }
     } catch(e) {}
+    return true;
+  }
+  function focusEpicenter(lat, lon) {
+    var s = stage();
+    if(!s) return;
+    pendingEpicenter = { lat: lat, lon: lon };
+    if(s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
+    if(s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
+    if(s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
+    markEpicenter(lat, lon);
   }
   if(presetSel) presetSel.addEventListener('change', function() {
     var key = presetSel.value;
@@ -1016,9 +1024,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   }
   function shareUrl() {
     var base = location.origin + location.pathname;
-    return base + '?m=' + parseFloat(slideM.value).toFixed(1) +
+    var url = base + '?m=' + parseFloat(slideM.value).toFixed(1) +
       '&d=' + parseInt(slideD.value, 10) +
       '&t=' + parseInt(slideT.value, 10);
+    if(pendingEpicenter) {
+      url += '&lat=' + pendingEpicenter.lat + '&lon=' + pendingEpicenter.lon;
+    }
+    return url;
   }
   if(btnShare) btnShare.addEventListener('click', function() {
     copyText(shareUrl(), t('toastCopied'), t('toastCopyFail'));
@@ -1145,14 +1157,33 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(paused) resume();
     if(window.vm) window.vm.greenFlag();
     hidePanel();
+    if(!pendingEpicenter) return;
+    var lat = pendingEpicenter.lat, lon = pendingEpicenter.lon, tries = 0;
+    var timer = setInterval(function() {
+      tries++;
+      var s = stage();
+      var list = s && s.variables[LID.epicenter];
+      var cleared = list && list.value && list.value.length < 7;
+      if(cleared || tries > 25) {
+        clearInterval(timer);
+        markEpicenter(lat, lon);
+        if(s && s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
+        if(s && s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
+      }
+    }, 120);
   }
 
   function currentSettings() {
-    return {
+    var s = {
       magnitude: parseFloat(slideM.value),
       depthKm: parseInt(slideD.value, 10),
       startOffsetSec: parseInt(slideT.value, 10)
     };
+    if(pendingEpicenter) {
+      s.lat = pendingEpicenter.lat;
+      s.lon = pendingEpicenter.lon;
+    }
+    return s;
   }
   function applySettings(s) {
     var m = numOr(s.magnitude, NaN), d = numOr(s.depthKm, NaN), t = numOr(s.startOffsetSec, NaN);
@@ -1169,11 +1200,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   function settingsFromUrl() {
     var q;
     try { q = new URLSearchParams(location.search); } catch(e) { return null; }
-    if(!q.has('m') && !q.has('d') && !q.has('t')) return null;
+    if(!q.has('m') && !q.has('d') && !q.has('t') && !q.has('lat') && !q.has('lon')) return null;
     return {
       magnitude: q.has('m') ? parseFloat(q.get('m')) : parseFloat(slideM.value),
       depthKm: q.has('d') ? parseFloat(q.get('d')) : parseInt(slideD.value, 10),
-      startOffsetSec: q.has('t') ? parseFloat(q.get('t')) : parseInt(slideT.value, 10)
+      startOffsetSec: q.has('t') ? parseFloat(q.get('t')) : parseInt(slideT.value, 10),
+      lat: q.has('lat') ? parseFloat(q.get('lat')) : NaN,
+      lon: q.has('lon') ? parseFloat(q.get('lon')) : NaN
     };
   }
   function stamp() {
@@ -1210,6 +1243,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       catch(e) { showToast(t('toastBadJson')); return; }
       var s = (data && data.settings) ? data.settings : data;
       if(!s || !applySettings(s)) { showToast(t('toastBadFormat')); return; }
+      if(isFinite(numOr(s.lat, NaN)) && isFinite(numOr(s.lon, NaN))) focusEpicenter(Number(s.lat), Number(s.lon));
       showToast(t('toastLoaded'));
     };
     rd.readAsText(f);
@@ -1261,7 +1295,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     pullVars();
     applyVolume();
     var urlSettings = settingsFromUrl();
-    if(urlSettings && applySettings(urlSettings)) showToast(t('toastUrlApplied'));
+    if(urlSettings && applySettings(urlSettings)) {
+      if(isFinite(urlSettings.lat) && isFinite(urlSettings.lon)) focusEpicenter(urlSettings.lat, urlSettings.lon);
+      showToast(t('toastUrlApplied'));
+    }
     updateEEWOverlay();
     setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); maybeShowHelp(); applyVolume(); }, 200);
     window.addEventListener('resize', updateEEWOverlay);
