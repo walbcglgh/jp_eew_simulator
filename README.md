@@ -28,6 +28,10 @@ TurboWarp（Scratch）で動作する、日本向けの地震・緊急地震速�
 
 - 初回起動時に操作方法が自動で表示されます（設定パネルの「?」ボタンでも再表示）。
 - 設定パネル内の「書き出し」でマグニチュード・深さ・タイミングを JSON に保存し、「読み込み」で復元できます。
+- 「プリセット」から代表的な地震（東日本大震災・熊本地震・北海道胆振東部地震・能登半島地震・兵庫県南部地震）の規模と深さを一括で適用できます。
+- 「共有」で現在の設定を含むリンクをコピーできます。`?m=7.0&d=10&t=0` 形式のリンクを開くと、その設定が自動で適用されます。
+- 「音量」スライダーと「ミュート」で効果音・読み上げの音量を調整できます（ブラウザに記憶）。
+- 「JA / 繁 / EN」で設定パネルと操作方法の表示言語を切り替えられます（ブラウザに記憶）。地図内の文字は日本語のままです。
 - 上記のキーはプロジェクト側（Scratch）のキー操作と重複しないものを選んでいます。
 
 ### タッチ操作（スマートフォン・タブレット）
@@ -152,6 +156,10 @@ python -m http.server 8000
 
 - 首次開啟會自動顯示操作說明（也可按設定面板的「?」再次開啟）。
 - 設定面板的「書き出し」可把規模、深度、發生時間輸出成 JSON，「読み込み」可還原。
+- 「預設情境」可一次套用代表性地震（東日本大震災、熊本地震、北海道胆振東部地震、能登半島地震、兵庫縣南部地震）的規模與深度。
+- 「分享」會複製含目前設定的連結。開啟 `?m=7.0&d=10&t=0` 形式的連結時，會自動套用該設定。
+- 「音量」滑桿與「靜音」可調整效果音與語音朗讀的音量（會記在瀏覽器）。
+- 「JA / 繁 / EN」可切換設定面板與操作說明的顯示語言（會記在瀏覽器）。地圖內的文字維持日文。
 - 上述按鍵已避開專案本身（Scratch）的鍵盤操作。
 
 ### 觸控操作（智慧型手機／平板）
@@ -276,6 +284,10 @@ A Japan-focused earthquake and Earthquake Early Warning (EEW) simulator built wi
 
 - The help sheet appears automatically on first launch (reopen it with the "?" button in the settings panel).
 - "書き出し" saves magnitude, depth and timing as JSON; "読み込み" restores them.
+- "Preset" applies the magnitude and depth of a representative earthquake at once (2011 Tohoku, 2016 Kumamoto, 2018 Hokkaido Iburi-East, 2024 Noto Peninsula, 1995 Great Hanshin).
+- "Share" copies a link with the current settings. Opening a link like `?m=7.0&d=10&t=0` applies those settings automatically.
+- The "Volume" slider and "Mute" control the sound effects and spoken announcements (remembered in the browser).
+- "JA / 繁 / EN" switches the language of the settings panel and the help screen (remembered in the browser). Text drawn on the map stays in Japanese.
 - These keys are chosen so they do not overlap the project's own (Scratch) key bindings.
 
 ### Touch controls (smartphone / tablet)

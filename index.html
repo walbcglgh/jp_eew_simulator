@@ -566,6 +566,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   font-size:11px; color:#cfcfcf;
   font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
 }
+#sim-preset-row { display:flex; gap:6px; align-items:center; }
+#sim-preset-select {
+  flex:1; height:30px; border-radius:4px; border:1px solid #3a3a3a; background:#1a1a1a;
+  color:#cfcfcf; padding:0 6px; outline:none; cursor:pointer;
+  font-size:11px;
+  font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+}
+#sim-preset-select:hover { background:#242424; border-color:#555555; }
+#sim-preset-select option { background:#1a1a1a; color:#e0e0e0; }
+#sim-lang-row { display:flex; gap:6px; }
+#sim-lang-row .sim-btn { font-size:11px; color:#9a9a9a; }
 .sim-shortcuts {
   display:grid; grid-template-columns:auto 1fr; gap:5px 10px;
   align-items:center; margin-top:2px;
@@ -622,16 +633,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <div id="sim-ctrl-panel">
   <div id="sim-ctrl-title">
-    <span>シミュレーション設定</span>
+    <span data-i18n="title">シミュレーション設定</span>
     <button id="sim-ctrl-close" title="閉じる">&times;</button>
   </div>
   <div class="sim-info-top">
     <div class="sim-info-row">
-      <span class="sim-info-label">震央</span>
+      <span class="sim-info-label" data-i18n="epicenter">震央</span>
       <span class="sim-info-val highlight" id="sim-epicenter-val">&#8212;</span>
     </div>
     <div class="sim-info-row">
-      <span class="sim-info-label">発生後</span>
+      <span class="sim-info-label" data-i18n="elapsed">発生後</span>
       <span class="sim-info-val" id="sim-elapsed-val">&#8212;</span>
     </div>
   </div>
@@ -641,53 +652,145 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <button class="sim-btn" id="sim-btn-stop"  title="ストップ"><svg width="14" height="14" viewBox="0 0 24 24" fill="#c96a6a"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
   </div>
   <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name">マグニチュード</span><span class="sim-label-val" id="sim-val-m">M 5.0</span></div>
+    <div class="sim-label-row"><span class="sim-label-name" data-i18n="mag">マグニチュード</span><span class="sim-label-val" id="sim-val-m">M 5.0</span></div>
     <input class="sim-slider" id="sim-slide-m" type="range" min="1" max="12" step="0.1" value="5">
   </div>
   <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name">震源の深さ</span><span class="sim-label-val" id="sim-val-d">10 km</span></div>
+    <div class="sim-label-row"><span class="sim-label-name" data-i18n="depth">震源の深さ</span><span class="sim-label-val" id="sim-val-d">10 km</span></div>
     <input class="sim-slider" id="sim-slide-d" type="range" min="0" max="1000" step="1" value="10">
   </div>
   <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name">発生タイミング</span><span class="sim-label-val" id="sim-val-t">0 秒</span></div>
+    <div class="sim-label-row"><span class="sim-label-name" data-i18n="timing">発生タイミング</span><span class="sim-label-val" id="sim-val-t">0 秒</span></div>
     <input class="sim-slider" id="sim-slide-t" type="range" min="0" max="300" step="1" value="0">
+  </div>
+  <div class="sim-row">
+    <div class="sim-label-row"><span class="sim-label-name" data-i18n="volume">音量</span><span class="sim-label-val" id="sim-val-volume">100%</span></div>
+    <input class="sim-slider" id="sim-slide-volume" type="range" min="0" max="100" step="1" value="100">
+  </div>
+  <button class="sim-btn" id="sim-btn-mute" title="ミュート" style="display:inline-flex; width:auto; flex:0 0 auto; margin-top:6px;" data-i18n="mute">ミュート</button>
+  <div class="sim-row" id="sim-preset-row">
+    <select id="sim-preset-select" class="sim-btn-text" style="flex:1;">
+      <option value="" disabled selected data-i18n="presetSelect">プリセット</option>
+      <option value='{"magnitude":9.0,"depthKm":24,"startOffsetSec":0}' data-i18n="presetJp">東日本大震災（2011）</option>
+      <option value='{"magnitude":7.3,"depthKm":12,"startOffsetSec":0}' data-i18n="presetKum">熊本地震 本震（2016）</option>
+      <option value='{"magnitude":6.7,"depthKm":37,"startOffsetSec":0}' data-i18n="presetHokkaido">北海道胆振東部地震（2018）</option>
+      <option value='{"magnitude":7.6,"depthKm":16,"startOffsetSec":0}' data-i18n="presetNoto">能登半島地震（2024）</option>
+      <option value='{"magnitude":7.3,"depthKm":16,"startOffsetSec":0}' data-i18n="presetHyogo">兵庫県南部地震（1995）</option>
+    </select>
+    <button class="sim-btn sim-btn-text" id="sim-btn-share" title="設定リンクをコピー" data-i18n="share">共有</button>
+  </div>
+  <div class="sim-row" id="sim-lang-row">
+    <button class="sim-btn sim-btn-text" data-lang="ja">JA</button>
+    <button class="sim-btn sim-btn-text" data-lang="zh">繁</button>
+    <button class="sim-btn sim-btn-text" data-lang="en">EN</button>
   </div>
   <div class="sim-info-divider">
     <div class="sim-shortcuts">
-      <span class="sim-kbd">Enter</span><span class="sim-info-label">リスタート（地震を発生）</span>
-      <span class="sim-kbd">C</span><span class="sim-info-label">設定パネルの開閉</span>
-      <span class="sim-kbd">1 / 2 / 3</span><span class="sim-info-label">地震情報 / EEW / 津波</span>
-      <span class="sim-kbd">?</span><span class="sim-info-label">この操作方法</span>
+      <span class="sim-kbd">Enter</span><span class="sim-info-label" data-i18n="scRestart">リスタート（地震を発生）</span>
+      <span class="sim-kbd">C</span><span class="sim-info-label" data-i18n="scPanel">設定パネルの開閉</span>
+      <span class="sim-kbd">1 / 2 / 3</span><span class="sim-info-label" data-i18n="scTabs">地震情報 / EEW / 津波</span>
+      <span class="sim-kbd">?</span><span class="sim-info-label" data-i18n="scHelp">この操作方法</span>
     </div>
   </div>
   <div class="sim-io-row">
-    <button class="sim-btn sim-btn-text" id="sim-btn-export" title="設定を JSON で保存">書き出し</button>
-    <button class="sim-btn sim-btn-text" id="sim-btn-import" title="保存した設定を読み込み">読み込み</button>
-    <button class="sim-btn sim-btn-text" id="sim-btn-help" title="操作方法" style="flex:0 0 42px">?</button>
+    <button class="sim-btn sim-btn-text" id="sim-btn-export" title="設定を JSON で保存" data-i18n="export">書き出し</button>
+    <button class="sim-btn sim-btn-text" id="sim-btn-import" title="保存した設定を読み込み" data-i18n="import">読み込み</button>
+    <button class="sim-btn sim-btn-text" id="sim-btn-help" title="操作方法" style="flex:0 0 42px" data-i18n="help">?</button>
   </div>
 </div>
-<div id="sim-ctrl-toggle" title="設定">設定</div>
+<div id="sim-ctrl-toggle" title="設定" data-i18n="settings">設定</div>
 <div id="sim-eew-epicenter"></div>
 <input type="file" id="sim-file-input" accept="application/json,.json" hidden>
 <div id="sim-toast"></div>
 <div id="sim-help">
   <div id="sim-help-box">
-    <div id="sim-help-title">操作方法</div>
+    <div id="sim-help-title" data-i18n="helpTitle">操作方法</div>
     <div id="sim-help-sub">強震モニタ風地震シミュレーション</div>
     <div class="sim-shortcuts">
-      <span class="sim-kbd">Enter</span><span class="sim-info-label">リスタート（地震を発生）</span>
-      <span class="sim-kbd">C</span><span class="sim-info-label">設定パネルの開閉</span>
-      <span class="sim-kbd">1 / 2 / 3</span><span class="sim-info-label">地震情報 / EEW / 津波 タブ</span>
-      <span class="sim-kbd">Space</span><span class="sim-info-label">開始 / 一時停止（Scratch 側）</span>
-      <span class="sim-kbd">Esc</span><span class="sim-info-label">この画面を閉じる</span>
+      <span class="sim-kbd">Enter</span><span class="sim-info-label" data-i18n="scRestart">リスタート（地震を発生）</span>
+      <span class="sim-kbd">C</span><span class="sim-info-label" data-i18n="scPanel">設定パネルの開閉</span>
+      <span class="sim-kbd">1 / 2 / 3</span><span class="sim-info-label" data-i18n="scTabsHelp">地震情報 / EEW / 津波 タブ</span>
+      <span class="sim-kbd">Space</span><span class="sim-info-label" data-i18n="scSpace">開始 / 一時停止（Scratch 側）</span>
+      <span class="sim-kbd">Esc</span><span class="sim-info-label" data-i18n="scEsc">この画面を閉じる</span>
     </div>
-    <p id="sim-help-text">左下の「設定」でマグニチュード・震源の深さ・発生タイミングを調整します。［旗］で地震を発生、［一時停止］で停止、［停止］で終了します。EEW 宣布中は推定震央の名称が画面上に表示されます。設定は「書き出し」で JSON に保存し、「読み込み」で復元できます。</p>
-    <button id="sim-help-close">閉じる</button>
+    <p id="sim-help-text" data-i18n="helpText">左下の「設定」でマグニチュード・震源の深さ・発生タイミングを調整します。［旗］で地震を発生、［一時停止］で停止、［停止］で終了します。EEW 宣布中は推定震央の名称が画面上に表示されます。設定は「書き出し」で JSON に保存し、「読み込み」で復元できます。</p>
+    <button id="sim-help-close" data-i18n="close">閉じる</button>
   </div>
 </div>
 
 <script id="sim-ui-js">
 (function() {
+  var I18N = {
+    ja: {
+      title:'シミュレーション設定', epicenter:'震央', elapsed:'発生後',
+      mag:'マグニチュード', depth:'震源の深さ', timing:'発生タイミング',
+      volume:'音量', mute:'ミュート', settings:'設定', close:'閉じる',
+      presetSelect:'プリセット', presetJp:'東日本大震災（2011）', presetKum:'熊本地震 本震（2016）',
+      presetHokkaido:'北海道胆振東部地震（2018）', presetNoto:'能登半島地震（2024）', presetHyogo:'兵庫県南部地震（1995）',
+      share:'共有', export:'書き出し', import:'読み込み', help:'?', sec:'秒',
+      helpTitle:'操作方法',
+      helpText:'左下の「設定」でマグニチュード・震源の深さ・発生タイミングを調整します。［旗］で地震を発生、［一時停止］で停止、［停止］で終了します。EEW 宣布中は推定震央の名称が画面上に表示されます。設定は「書き出し」で JSON に保存し、「読み込み」で復元できます。',
+      scRestart:'リスタート（地震を発生）', scPanel:'設定パネルの開閉', scTabs:'地震情報 / EEW / 津波',
+      scTabsHelp:'地震情報 / EEW / 津波 タブ', scHelp:'この操作方法', scSpace:'開始 / 一時停止（Scratch 側）', scEsc:'この画面を閉じる',
+      titleRestart:'リスタート', titlePause:'一時停止 / 再開', titleStop:'ストップ',
+      titleExport:'設定を JSON で保存', titleImport:'保存した設定を読み込み',
+      toastSaved:'設定を保存しました', toastLoaded:'設定を読み込みました', toastBadJson:'JSON を読み込めませんでした',
+      toastBadFormat:'設定の形式が違います', toastCopied:'リンクをコピーしました', toastCopyFail:'コピーできませんでした',
+      toastMuted:'ミュートしました', toastUnmuted:'ミュートを解除しました', toastPreset:'プリセットを適用しました',
+      toastUrlApplied:'共有された設定を適用しました'
+    },
+    zh: {
+      title:'模擬設定', epicenter:'震央', elapsed:'發生後',
+      mag:'規模', depth:'震源深度', timing:'發生時間',
+      volume:'音量', mute:'靜音', settings:'設定', close:'關閉',
+      presetSelect:'預設情境', presetJp:'東日本大震災（2011）', presetKum:'熊本地震 主震（2016）',
+      presetHokkaido:'北海道胆振東部地震（2018）', presetNoto:'能登半島地震（2024）', presetHyogo:'兵庫縣南部地震（1995）',
+      share:'分享', export:'匯出', import:'匯入', help:'?', sec:'秒',
+      helpTitle:'操作說明',
+      helpText:'用左下角「設定」調整規模、震源深度與發生時間。［旗］發生地震、［暫停］停止、［停止］結束。EEW 發布期間，畫面會顯示推定震央名稱。設定可用「匯出」存成 JSON，再用「匯入」還原。',
+      scRestart:'重新開始（發生地震）', scPanel:'開關設定面板', scTabs:'地震資訊 / EEW / 津波',
+      scTabsHelp:'地震資訊 / EEW / 津波 分頁', scHelp:'本操作說明', scSpace:'開始 / 暫停（Scratch 端）', scEsc:'關閉本畫面',
+      titleRestart:'重新開始', titlePause:'暫停 / 繼續', titleStop:'停止',
+      titleExport:'將設定存成 JSON', titleImport:'讀取已儲存的設定',
+      toastSaved:'已儲存設定', toastLoaded:'已讀取設定', toastBadJson:'無法讀取 JSON',
+      toastBadFormat:'設定格式不正確', toastCopied:'已複製連結', toastCopyFail:'複製失敗',
+      toastMuted:'已靜音', toastUnmuted:'已取消靜音', toastPreset:'已套用預設情境',
+      toastUrlApplied:'已套用分享的設定'
+    },
+    en: {
+      title:'Simulation settings', epicenter:'Epicenter', elapsed:'Elapsed',
+      mag:'Magnitude', depth:'Focal depth', timing:'Occurrence time',
+      volume:'Volume', mute:'Mute', settings:'Settings', close:'Close',
+      presetSelect:'Preset', presetJp:'2011 Tohoku earthquake', presetKum:'2016 Kumamoto earthquake (mainshock)',
+      presetHokkaido:'2018 Hokkaido Iburi-East earthquake', presetNoto:'2024 Noto Peninsula earthquake', presetHyogo:'1995 Great Hanshin earthquake',
+      share:'Share', export:'Export', import:'Import', help:'?', sec:'s',
+      helpTitle:'How to use',
+      helpText:'Use "Settings" at the bottom left to adjust magnitude, focal depth and occurrence time. [Flag] triggers the earthquake, [Pause] suspends it, [Stop] ends it. While an EEW is active the estimated epicenter name appears on screen. Export your settings to JSON and restore them with Import.',
+      scRestart:'Restart (trigger the earthquake)', scPanel:'Toggle the settings panel', scTabs:'Earthquake info / EEW / Tsunami',
+      scTabsHelp:'Earthquake info / EEW / Tsunami tabs', scHelp:'This help', scSpace:'Start / pause (Scratch side)', scEsc:'Close this screen',
+      titleRestart:'Restart', titlePause:'Pause / resume', titleStop:'Stop',
+      titleExport:'Save settings as JSON', titleImport:'Load saved settings',
+      toastSaved:'Settings saved', toastLoaded:'Settings loaded', toastBadJson:'Could not read the JSON',
+      toastBadFormat:'Invalid settings format', toastCopied:'Link copied', toastCopyFail:'Copy failed',
+      toastMuted:'Muted', toastUnmuted:'Unmuted', toastPreset:'Preset applied',
+      toastUrlApplied:'Applied the shared settings'
+    }
+  };
+  var LANG_KEY = 'eewsim.lang';
+  var VOL_KEY  = 'eewsim.volume';
+  var TITLE_KEYS = {
+    'sim-btn-flag':'titleRestart', 'sim-btn-pause':'titlePause', 'sim-btn-stop':'titleStop',
+    'sim-ctrl-close':'close', 'sim-btn-mute':'mute', 'sim-preset-select':'presetSelect',
+    'sim-btn-share':'share', 'sim-btn-export':'titleExport', 'sim-btn-import':'titleImport',
+    'sim-btn-help':'help', 'sim-ctrl-toggle':'settings', 'sim-help-close':'close'
+  };
+  var lang = 'ja';
+  try { var savedLang = localStorage.getItem(LANG_KEY); if(savedLang && I18N[savedLang]) lang = savedLang; } catch(e) {}
+  function t(key) {
+    var d = I18N[lang] || I18N.ja;
+    if(d && d[key] != null) return d[key];
+    return (I18N.ja[key] != null) ? I18N.ja[key] : key;
+  }
   var PAUSE_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg>';
   var PLAY_ICON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><path d="M8 5v14l11-7z"/></svg>';
   var panel    = document.getElementById('sim-ctrl-panel');
@@ -705,7 +808,51 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   var toggle   = document.getElementById('sim-ctrl-toggle');
   var closeBtn = document.getElementById('sim-ctrl-close');
   var eewOverlay = document.getElementById('sim-eew-epicenter');
+  var slideVol = document.getElementById('sim-slide-volume');
+  var valVol   = document.getElementById('sim-val-volume');
+  var btnMute  = document.getElementById('sim-btn-mute');
+  var presetSel = document.getElementById('sim-preset-select');
+  var btnShare = document.getElementById('sim-btn-share');
   var paused   = false;
+
+  var volume = 100;
+  var muted  = false;
+  try { var savedVol = parseInt(localStorage.getItem(VOL_KEY), 10); if(isFinite(savedVol)) volume = Math.min(100, Math.max(0, savedVol)); } catch(e) {}
+  if(slideVol) slideVol.value = volume;
+
+  function audioEngine() {
+    var ae = window.vm && window.vm.runtime && window.vm.runtime.audioEngine;
+    return (ae && ae.inputNode && ae.inputNode.gain) ? ae : null;
+  }
+  function applyVolume() {
+    var ae = audioEngine();
+    var v = muted ? 0 : (volume / 100);
+    if(ae) {
+      try { ae.inputNode.gain.setTargetAtTime(v, ae.audioContext.currentTime, 0.02); }
+      catch(e) { try { ae.inputNode.gain.value = v; } catch(e2) {} }
+    }
+    if(valVol) valVol.textContent = muted ? 'MUTE' : (volume + '%');
+    if(btnMute) btnMute.style.borderColor = muted ? '#7a3a3a' : '';
+  }
+
+  function applyLang() {
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for(var i = 0; i < nodes.length; i++) {
+      var key = nodes[i].getAttribute('data-i18n');
+      if(key) nodes[i].textContent = t(key);
+    }
+    Object.keys(TITLE_KEYS).forEach(function(id) {
+      var el = document.getElementById(id);
+      if(el) el.title = t(TITLE_KEYS[id]);
+    });
+    var langBtns = document.querySelectorAll('#sim-lang-row [data-lang]');
+    for(var j = 0; j < langBtns.length; j++) {
+      var on = langBtns[j].getAttribute('data-lang') === lang;
+      langBtns[j].style.borderColor = on ? '#6a6a6a' : '';
+      langBtns[j].style.color = on ? '#ffffff' : '';
+    }
+    syncLabels();
+  }
 
   function showPanel() { panel.classList.add('visible'); if(toggle) toggle.style.display='none'; }
   function hidePanel() { panel.classList.remove('visible'); if(toggle) toggle.style.display='block'; }
@@ -725,9 +872,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   var LID = { epicenter:'w6RbQi2ENF9PN18vXYUF', jma:'3OYPeliWyrC0Z5qC2xvI' };
 
   function syncLabels() {
-    valM.textContent = 'M ' + parseFloat(slideM.value).toFixed(1);
-    valD.textContent = parseInt(slideD.value) + ' km';
-    valT.textContent = parseInt(slideT.value) + ' 秒';
+    valM.textContent = 'M ' + parseFloat(slideM.value).toFixed(1);
+    valD.textContent = parseInt(slideD.value) + ' km';
+    valT.textContent = parseInt(slideT.value) + ' ' + t('sec');
   }
   syncLabels();
 
@@ -758,6 +905,73 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   });
   if(toggle) toggle.addEventListener('click', showPanel);
   if(closeBtn) closeBtn.addEventListener('click', hidePanel);
+
+  if(slideVol) slideVol.addEventListener('input', function() {
+    volume = parseInt(slideVol.value, 10) || 0;
+    if(volume > 0) muted = false;
+    applyVolume();
+    try { localStorage.setItem(VOL_KEY, String(volume)); } catch(e) {}
+  });
+  if(btnMute) btnMute.addEventListener('click', function() {
+    muted = !muted;
+    showToast(muted ? t('toastMuted') : t('toastUnmuted'));
+    applyVolume();
+  });
+  if(presetSel) presetSel.addEventListener('change', function() {
+    var raw = presetSel.value;
+    presetSel.value = '';
+    if(!raw) return;
+    var obj;
+    try { obj = JSON.parse(raw); } catch(e) { return; }
+    if(applySettings(obj)) showToast(t('toastPreset'));
+  });
+
+  function legacyCopy(str) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = str;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch(e) { return false; }
+  }
+  function copyText(str, okMsg, ngMsg) {
+    if(navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(
+        function() { showToast(okMsg); },
+        function() { showToast(legacyCopy(str) ? okMsg : ngMsg); }
+      );
+    } else {
+      showToast(legacyCopy(str) ? okMsg : ngMsg);
+    }
+  }
+  function shareUrl() {
+    var base = location.origin + location.pathname;
+    return base + '?m=' + parseFloat(slideM.value).toFixed(1) +
+      '&d=' + parseInt(slideD.value, 10) +
+      '&t=' + parseInt(slideT.value, 10);
+  }
+  if(btnShare) btnShare.addEventListener('click', function() {
+    copyText(shareUrl(), t('toastCopied'), t('toastCopyFail'));
+  });
+
+  var langBtns = document.querySelectorAll('#sim-lang-row [data-lang]');
+  for(var li = 0; li < langBtns.length; li++) {
+    (function(b) {
+      b.addEventListener('click', function() {
+        var nl = b.getAttribute('data-lang');
+        if(!I18N[nl]) return;
+        lang = nl;
+        try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
+        applyLang();
+      });
+    })(langBtns[li]);
+  }
 
   function pause() {
     try{ if(window.vm.runtime.pause) window.vm.runtime.pause(); }catch(e){}
@@ -792,7 +1006,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     /* 経過秒 – スタート後発生秒数 */
     var ela = getVar(VID.ela);
     elapsedVal.textContent = (ela !== null && ela !== '' && Number(ela) > 0)
-      ? Math.round(Number(ela)) + ' 秒'
+      ? Math.round(Number(ela)) + ' ' + t('sec')
       : '—';
   }
 
@@ -881,6 +1095,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     syncLabels();
     return true;
   }
+  function settingsFromUrl() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch(e) { return null; }
+    if(!q.has('m') && !q.has('d') && !q.has('t')) return null;
+    return {
+      magnitude: q.has('m') ? parseFloat(q.get('m')) : parseFloat(slideM.value),
+      depthKm: q.has('d') ? parseFloat(q.get('d')) : parseInt(slideD.value, 10),
+      startOffsetSec: q.has('t') ? parseFloat(q.get('t')) : parseInt(slideT.value, 10)
+    };
+  }
   function stamp() {
     var d = new Date(), p = function(n){ return (n < 10 ? '0' : '') + n; };
     return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes());
@@ -902,7 +1126,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-    showToast('設定を保存しました');
+    showToast(t('toastSaved'));
   });
   if(btnImport) btnImport.addEventListener('click', function() { if(fileInput) fileInput.click(); });
   if(fileInput) fileInput.addEventListener('change', function() {
@@ -912,10 +1136,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     rd.onload = function() {
       var data;
       try { data = JSON.parse(String(rd.result)); }
-      catch(e) { showToast('JSON を読み込めませんでした'); return; }
+      catch(e) { showToast(t('toastBadJson')); return; }
       var s = (data && data.settings) ? data.settings : data;
-      if(!s || !applySettings(s)) { showToast('設定の形式が違います'); return; }
-      showToast('設定を読み込みました');
+      if(!s || !applySettings(s)) { showToast(t('toastBadFormat')); return; }
+      showToast(t('toastLoaded'));
     };
     rd.readAsText(f);
     fileInput.value = '';
@@ -962,9 +1186,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(!window.vm||!window.vm.runtime||!window.vm.runtime.targets||window.vm.runtime.targets.length<2)
       return setTimeout(init, 300);
     showPanel();
+    applyLang();
     pullVars();
+    applyVolume();
+    var urlSettings = settingsFromUrl();
+    if(urlSettings && applySettings(urlSettings)) showToast(t('toastUrlApplied'));
     updateEEWOverlay();
-    setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); maybeShowHelp(); }, 200);
+    setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); maybeShowHelp(); applyVolume(); }, 200);
     window.addEventListener('resize', updateEEWOverlay);
   }
 
