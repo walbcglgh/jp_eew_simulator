@@ -566,17 +566,30 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   font-size:11px; color:#cfcfcf;
   font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
 }
-#sim-preset-row { display:flex; gap:6px; align-items:center; }
-#sim-preset-select {
-  flex:1; height:30px; border-radius:4px; border:1px solid #3a3a3a; background:#1a1a1a;
-  color:#cfcfcf; padding:0 6px; outline:none; cursor:pointer;
-  font-size:11px;
+#sim-tabs { display:flex; gap:4px; margin:0 0 8px; }
+.sim-tab {
+  flex:1; height:24px; border-radius:4px; border:1px solid #2e2e2e; background:transparent;
+  color:#8a8a8a; font-size:11px; cursor:pointer;
   font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
 }
-#sim-preset-select:hover { background:#242424; border-color:#555555; }
-#sim-preset-select option { background:#1a1a1a; color:#e0e0e0; }
-#sim-lang-row { display:flex; gap:6px; }
-#sim-lang-row .sim-btn { font-size:11px; color:#9a9a9a; }
+.sim-tab.active { background:#1c1c1c; border-color:#555555; color:#f0f0f0; }
+.sim-page { display:none; }
+.sim-page.active { display:block; }
+#sim-preset-select, #sim-lang-select {
+  width:100%; height:30px; border-radius:4px; border:1px solid #3a3a3a; background:#1a1a1a;
+  color:#e0e0e0; padding:0 6px; outline:none; cursor:pointer; font-size:11px;
+  font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+}
+#sim-preset-select:hover, #sim-lang-select:hover { background:#242424; border-color:#555555; }
+#sim-preset-select option, #sim-lang-select option { background:#1a1a1a; color:#e0e0e0; }
+.sim-vol { display:flex; align-items:center; gap:8px; }
+.sim-vol .sim-slider { flex:1; }
+#sim-btn-mute {
+  flex:0 0 auto; width:auto; height:26px; padding:0 10px; border-radius:4px;
+  border:1px solid #5a5a5a; background:#1a1a1a; color:#f2f2f2; font-size:11px; cursor:pointer;
+  font-family:"Zen Maru Gothic",-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+}
+#sim-btn-mute.muted { background:#7a2e2e; border-color:#c96a6a; color:#ffffff; }
 .sim-shortcuts {
   display:grid; grid-template-columns:auto 1fr; gap:5px 10px;
   align-items:center; margin-top:2px;
@@ -646,56 +659,63 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       <span class="sim-info-val" id="sim-elapsed-val">&#8212;</span>
     </div>
   </div>
+  <div id="sim-tabs">
+    <button class="sim-tab active" data-page="quake" data-i18n="tabQuake">地震</button>
+    <button class="sim-tab" data-page="sound" data-i18n="tabSound">音声</button>
+    <button class="sim-tab" data-page="more" data-i18n="tabMore">その他</button>
+  </div>
   <div id="sim-btn-row">
     <button class="sim-btn" id="sim-btn-flag"  title="リスタート"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 3l13 5-13 5"/></svg></button>
     <button class="sim-btn" id="sim-btn-pause" title="一時停止 / 再開"><svg width="14" height="14" viewBox="0 0 24 24" fill="#e0e0e0"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg></button>
     <button class="sim-btn" id="sim-btn-stop"  title="ストップ"><svg width="14" height="14" viewBox="0 0 24 24" fill="#c96a6a"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
   </div>
-  <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name" data-i18n="mag">マグニチュード</span><span class="sim-label-val" id="sim-val-m">M 5.0</span></div>
-    <input class="sim-slider" id="sim-slide-m" type="range" min="1" max="12" step="0.1" value="5">
-  </div>
-  <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name" data-i18n="depth">震源の深さ</span><span class="sim-label-val" id="sim-val-d">10 km</span></div>
-    <input class="sim-slider" id="sim-slide-d" type="range" min="0" max="1000" step="1" value="10">
-  </div>
-  <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name" data-i18n="timing">発生タイミング</span><span class="sim-label-val" id="sim-val-t">0 秒</span></div>
-    <input class="sim-slider" id="sim-slide-t" type="range" min="0" max="300" step="1" value="0">
-  </div>
-  <div class="sim-row">
-    <div class="sim-label-row"><span class="sim-label-name" data-i18n="volume">音量</span><span class="sim-label-val" id="sim-val-volume">100%</span></div>
-    <input class="sim-slider" id="sim-slide-volume" type="range" min="0" max="100" step="1" value="100">
-  </div>
-  <button class="sim-btn" id="sim-btn-mute" title="ミュート" style="display:inline-flex; width:auto; flex:0 0 auto; margin-top:6px;" data-i18n="mute">ミュート</button>
-  <div class="sim-row" id="sim-preset-row">
-    <select id="sim-preset-select" class="sim-btn-text" style="flex:1;">
-      <option value="" disabled selected data-i18n="presetSelect">プリセット</option>
-      <option value='{"magnitude":9.0,"depthKm":24,"startOffsetSec":0}' data-i18n="presetJp">東日本大震災（2011）</option>
-      <option value='{"magnitude":7.3,"depthKm":12,"startOffsetSec":0}' data-i18n="presetKum">熊本地震 本震（2016）</option>
-      <option value='{"magnitude":6.7,"depthKm":37,"startOffsetSec":0}' data-i18n="presetHokkaido">北海道胆振東部地震（2018）</option>
-      <option value='{"magnitude":7.6,"depthKm":16,"startOffsetSec":0}' data-i18n="presetNoto">能登半島地震（2024）</option>
-      <option value='{"magnitude":7.3,"depthKm":16,"startOffsetSec":0}' data-i18n="presetHyogo">兵庫県南部地震（1995）</option>
-    </select>
-    <button class="sim-btn sim-btn-text" id="sim-btn-share" title="設定リンクをコピー" data-i18n="share">共有</button>
-  </div>
-  <div class="sim-row" id="sim-lang-row">
-    <button class="sim-btn sim-btn-text" data-lang="ja">JA</button>
-    <button class="sim-btn sim-btn-text" data-lang="zh">繁</button>
-    <button class="sim-btn sim-btn-text" data-lang="en">EN</button>
-  </div>
-  <div class="sim-info-divider">
-    <div class="sim-shortcuts">
-      <span class="sim-kbd">Enter</span><span class="sim-info-label" data-i18n="scRestart">リスタート（地震を発生）</span>
-      <span class="sim-kbd">C</span><span class="sim-info-label" data-i18n="scPanel">設定パネルの開閉</span>
-      <span class="sim-kbd">1 / 2 / 3</span><span class="sim-info-label" data-i18n="scTabs">地震情報 / EEW / 津波</span>
-      <span class="sim-kbd">?</span><span class="sim-info-label" data-i18n="scHelp">この操作方法</span>
+  <div class="sim-page active" data-page="quake">
+    <div class="sim-row">
+      <select id="sim-preset-select">
+        <option value="" data-i18n="presetSelect">プリセット</option>
+        <option value="jp" data-i18n="presetJp">東日本大震災（2011）</option>
+        <option value="kumamoto" data-i18n="presetKum">熊本地震 本震（2016）</option>
+        <option value="hokkaido" data-i18n="presetHokkaido">北海道胆振東部地震（2018）</option>
+        <option value="noto" data-i18n="presetNoto">能登半島地震（2024）</option>
+        <option value="hanshin" data-i18n="presetHyogo">兵庫県南部地震（1995）</option>
+      </select>
+    </div>
+    <div class="sim-row">
+      <div class="sim-label-row"><span class="sim-label-name" data-i18n="mag">マグニチュード</span><span class="sim-label-val" id="sim-val-m">M 5.0</span></div>
+      <input class="sim-slider" id="sim-slide-m" type="range" min="1" max="12" step="0.1" value="5">
+    </div>
+    <div class="sim-row">
+      <div class="sim-label-row"><span class="sim-label-name" data-i18n="depth">震源の深さ</span><span class="sim-label-val" id="sim-val-d">10 km</span></div>
+      <input class="sim-slider" id="sim-slide-d" type="range" min="0" max="1000" step="1" value="10">
+    </div>
+    <div class="sim-row">
+      <div class="sim-label-row"><span class="sim-label-name" data-i18n="timing">発生タイミング</span><span class="sim-label-val" id="sim-val-t">0 秒</span></div>
+      <input class="sim-slider" id="sim-slide-t" type="range" min="0" max="300" step="1" value="0">
     </div>
   </div>
-  <div class="sim-io-row">
-    <button class="sim-btn sim-btn-text" id="sim-btn-export" title="設定を JSON で保存" data-i18n="export">書き出し</button>
-    <button class="sim-btn sim-btn-text" id="sim-btn-import" title="保存した設定を読み込み" data-i18n="import">読み込み</button>
-    <button class="sim-btn sim-btn-text" id="sim-btn-help" title="操作方法" style="flex:0 0 42px" data-i18n="help">?</button>
+  <div class="sim-page" data-page="sound">
+    <div class="sim-row">
+      <div class="sim-label-row"><span class="sim-label-name" data-i18n="volume">音量</span><span class="sim-label-val" id="sim-val-volume">100%</span></div>
+      <div class="sim-vol">
+        <input class="sim-slider" id="sim-slide-volume" type="range" min="0" max="100" step="1" value="100">
+        <button id="sim-btn-mute" title="ミュート" data-i18n="mute">ミュート</button>
+      </div>
+    </div>
+  </div>
+  <div class="sim-page" data-page="more">
+    <div class="sim-row">
+      <select id="sim-lang-select">
+        <option value="ja">日本語</option>
+        <option value="zh">繁體中文</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div class="sim-io-row">
+      <button class="sim-btn sim-btn-text" id="sim-btn-share" title="設定リンクをコピー" data-i18n="share">共有</button>
+      <button class="sim-btn sim-btn-text" id="sim-btn-export" title="設定を JSON で保存" data-i18n="export">書き出し</button>
+      <button class="sim-btn sim-btn-text" id="sim-btn-import" title="保存した設定を読み込み" data-i18n="import">読み込み</button>
+      <button class="sim-btn sim-btn-text" id="sim-btn-help" title="操作方法" style="flex:0 0 42px" data-i18n="help">?</button>
+    </div>
   </div>
 </div>
 <div id="sim-ctrl-toggle" title="設定" data-i18n="settings">設定</div>
@@ -725,6 +745,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       title:'シミュレーション設定', epicenter:'震央', elapsed:'発生後',
       mag:'マグニチュード', depth:'震源の深さ', timing:'発生タイミング',
       volume:'音量', mute:'ミュート', settings:'設定', close:'閉じる',
+      tabQuake:'地震', tabSound:'音声', tabMore:'その他',
       presetSelect:'プリセット', presetJp:'東日本大震災（2011）', presetKum:'熊本地震 本震（2016）',
       presetHokkaido:'北海道胆振東部地震（2018）', presetNoto:'能登半島地震（2024）', presetHyogo:'兵庫県南部地震（1995）',
       share:'共有', export:'書き出し', import:'読み込み', help:'?', sec:'秒',
@@ -743,6 +764,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       title:'模擬設定', epicenter:'震央', elapsed:'發生後',
       mag:'規模', depth:'震源深度', timing:'發生時間',
       volume:'音量', mute:'靜音', settings:'設定', close:'關閉',
+      tabQuake:'地震', tabSound:'音效', tabMore:'其他',
       presetSelect:'預設情境', presetJp:'東日本大震災（2011）', presetKum:'熊本地震 主震（2016）',
       presetHokkaido:'北海道胆振東部地震（2018）', presetNoto:'能登半島地震（2024）', presetHyogo:'兵庫縣南部地震（1995）',
       share:'分享', export:'匯出', import:'匯入', help:'?', sec:'秒',
@@ -761,6 +783,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       title:'Simulation settings', epicenter:'Epicenter', elapsed:'Elapsed',
       mag:'Magnitude', depth:'Focal depth', timing:'Occurrence time',
       volume:'Volume', mute:'Mute', settings:'Settings', close:'Close',
+      tabQuake:'Quake', tabSound:'Sound', tabMore:'More',
       presetSelect:'Preset', presetJp:'2011 Tohoku earthquake', presetKum:'2016 Kumamoto earthquake (mainshock)',
       presetHokkaido:'2018 Hokkaido Iburi-East earthquake', presetNoto:'2024 Noto Peninsula earthquake', presetHyogo:'1995 Great Hanshin earthquake',
       share:'Share', export:'Export', import:'Import', help:'?', sec:'s',
@@ -780,7 +803,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   var VOL_KEY  = 'eewsim.volume';
   var TITLE_KEYS = {
     'sim-btn-flag':'titleRestart', 'sim-btn-pause':'titlePause', 'sim-btn-stop':'titleStop',
-    'sim-ctrl-close':'close', 'sim-btn-mute':'mute', 'sim-preset-select':'presetSelect',
+    'sim-ctrl-close':'close', 'sim-btn-mute':'mute',
     'sim-btn-share':'share', 'sim-btn-export':'titleExport', 'sim-btn-import':'titleImport',
     'sim-btn-help':'help', 'sim-ctrl-toggle':'settings', 'sim-help-close':'close'
   };
@@ -832,7 +855,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       catch(e) { try { ae.inputNode.gain.value = v; } catch(e2) {} }
     }
     if(valVol) valVol.textContent = muted ? 'MUTE' : (volume + '%');
-    if(btnMute) btnMute.style.borderColor = muted ? '#7a3a3a' : '';
+    if(btnMute) btnMute.classList.toggle('muted', muted);
   }
 
   function applyLang() {
@@ -845,12 +868,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       var el = document.getElementById(id);
       if(el) el.title = t(TITLE_KEYS[id]);
     });
-    var langBtns = document.querySelectorAll('#sim-lang-row [data-lang]');
-    for(var j = 0; j < langBtns.length; j++) {
-      var on = langBtns[j].getAttribute('data-lang') === lang;
-      langBtns[j].style.borderColor = on ? '#6a6a6a' : '';
-      langBtns[j].style.color = on ? '#ffffff' : '';
-    }
+    var langSel = document.getElementById('sim-lang-select');
+    if(langSel) langSel.value = lang;
     syncLabels();
   }
 
@@ -866,7 +885,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     ep2: 'Bv3Xntvj12NnJ5PlWGXr',   /* 震源 (緊急地震速報旁の震央) */
     ela: 'DW4X1FGN37FrQHyx3OeU',   /* 発生後経過秒 (same as t if no dedicated var) */
     eew: 'cLEXs9QENRoExzadot96',   /* EEW 全体で発表中？  (0=off, 1/2=active) */
-    tab: 'Mi1pYIXTO2uH3mVAhKxf'    /* タブ (1=地震情報, 2=EEW, 3=津波)         */
+    tab: 'Mi1pYIXTO2uH3mVAhKxf',   /* タブ (1=地震情報, 2=EEW, 3=津波)         */
+    cx:  'VIskjWg3VLwWsTs3I0lI',   /* 7-センターX */
+    cy:  'XRT0aHyc0S8t4kkvJXxw',   /* 7-センターY */
+    zoom:'iwKioCy8xZ4x9kZBF9mF',   /* 7-拡大率 */
+    lookX:'gvdafUZaIYlI0aLwuAYW',  /* 調べるx（経度） */
+    lookY:'eX8NAi9p1cUr2PoR6XVu'   /* 調べるy（緯度） */
   };
   /* List IDs */
   var LID = { epicenter:'w6RbQi2ENF9PN18vXYUF', jma:'3OYPeliWyrC0Z5qC2xvI' };
@@ -917,13 +941,53 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     showToast(muted ? t('toastMuted') : t('toastUnmuted'));
     applyVolume();
   });
+  var PRESETS = {
+    jp:       { magnitude:9.0, depthKm:24, startOffsetSec:0, lat:38.1, lon:142.9 },
+    kumamoto: { magnitude:7.3, depthKm:12, startOffsetSec:0, lat:32.75, lon:130.76 },
+    hokkaido: { magnitude:6.7, depthKm:37, startOffsetSec:0, lat:42.69, lon:142.01 },
+    noto:     { magnitude:7.6, depthKm:16, startOffsetSec:0, lat:37.50, lon:137.27 },
+    hanshin:  { magnitude:7.3, depthKm:16, startOffsetSec:0, lat:34.60, lon:135.04 }
+  };
+  function projectX(lon) {
+    var x = ((lon + 44) % 360) - 180;
+    return x * 10;
+  }
+  function projectY(lat) {
+    var rad = (45 + lat / 2) * Math.PI / 180;
+    return Math.log(Math.tan(rad)) * 572.9577951308232 - 374.04780730560344;
+  }
+  function focusEpicenter(lat, lon) {
+    var s = stage();
+    if(!s) return;
+    var cx = projectX(lon), cy = projectY(lat), zoom = 4;
+    if(s.variables[VID.cx]) s.variables[VID.cx].value = cx;
+    if(s.variables[VID.cy]) s.variables[VID.cy].value = cy;
+    if(s.variables[VID.zoom]) s.variables[VID.zoom].value = zoom;
+    var list = s.variables[LID.epicenter];
+    if(list && list.value) {
+      while(list.value.length < 7) list.value.push('');
+      list.value[0] = lon;
+      list.value[1] = lat;
+    }
+    if(s.variables[VID.lookX]) s.variables[VID.lookX].value = lon;
+    if(s.variables[VID.lookY]) s.variables[VID.lookY].value = lat;
+    try {
+      if(window.vm && window.vm.runtime) {
+        window.vm.runtime.startHats('event_whenbroadcastreceived', {
+          BROADCAST_OPTION: '震央'
+        });
+      }
+    } catch(e) {}
+  }
   if(presetSel) presetSel.addEventListener('change', function() {
-    var raw = presetSel.value;
+    var key = presetSel.value;
     presetSel.value = '';
-    if(!raw) return;
-    var obj;
-    try { obj = JSON.parse(raw); } catch(e) { return; }
-    if(applySettings(obj)) showToast(t('toastPreset'));
+    var obj = PRESETS[key];
+    if(!obj) return;
+    if(applySettings(obj)) {
+      focusEpicenter(obj.lat, obj.lon);
+      showToast(t('toastPreset'));
+    }
   });
 
   function legacyCopy(str) {
@@ -960,17 +1024,24 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     copyText(shareUrl(), t('toastCopied'), t('toastCopyFail'));
   });
 
-  var langBtns = document.querySelectorAll('#sim-lang-row [data-lang]');
-  for(var li = 0; li < langBtns.length; li++) {
-    (function(b) {
-      b.addEventListener('click', function() {
-        var nl = b.getAttribute('data-lang');
-        if(!I18N[nl]) return;
-        lang = nl;
-        try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
-        applyLang();
+  var langSel = document.getElementById('sim-lang-select');
+  if(langSel) langSel.addEventListener('change', function() {
+    if(!I18N[langSel.value]) return;
+    lang = langSel.value;
+    try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
+    applyLang();
+  });
+  var pageTabs = document.querySelectorAll('.sim-tab');
+  for(var pi = 0; pi < pageTabs.length; pi++) {
+    (function(tab) {
+      tab.addEventListener('click', function() {
+        var page = tab.getAttribute('data-page');
+        var tabs = document.querySelectorAll('.sim-tab');
+        var pages = document.querySelectorAll('.sim-page');
+        for(var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i] === tab);
+        for(var j = 0; j < pages.length; j++) pages[j].classList.toggle('active', pages[j].getAttribute('data-page') === page);
       });
-    })(langBtns[li]);
+    })(pageTabs[pi]);
   }
 
   function pause() {
