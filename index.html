@@ -890,7 +890,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     cy:  'XRT0aHyc0S8t4kkvJXxw',   /* 7-センターY */
     zoom:'iwKioCy8xZ4x9kZBF9mF',   /* 7-拡大率 */
     lookX:'gvdafUZaIYlI0aLwuAYW',  /* 調べるx（経度） */
-    lookY:'eX8NAi9p1cUr2PoR6XVu'   /* 調べるy（緯度） */
+    lookY:'eX8NAi9p1cUr2PoR6XVu',  /* 調べるy（緯度） */
+    decided:'vegZ2ygz2HddkzRiggeF',/* 震源決定された（実際の震源情報 sprite） */
+    srcX:'Y4WF9V9N0xyQD4gGhzQt',   /* 震源X（実際の震源情報 sprite） */
+    srcY:'x8Gmgb0vTPCu6HfX8TND'    /* 震源Y（実際の震源情報 sprite） */
   };
   /* List IDs */
   var LID = { epicenter:'w6RbQi2ENF9PN18vXYUF', jma:'3OYPeliWyrC0Z5qC2xvI' };
@@ -948,6 +951,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     noto:     { magnitude:7.6, depthKm:16, startOffsetSec:0, lat:37.50, lon:137.27 },
     hanshin:  { magnitude:7.3, depthKm:16, startOffsetSec:0, lat:34.60, lon:135.04 }
   };
+  /* 地圖中心座標（專案的 7-センターX/Y 單位） */
   function projectX(lon) {
     var x = ((lon + 44) % 360) - 180;
     return x * 10;
@@ -956,36 +960,84 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     var rad = (45 + lat / 2) * Math.PI / 180;
     return Math.log(Math.tan(rad)) * 572.9577951308232 - 374.04780730560344;
   }
+  /* 舞台座標（專案從滑鼠位置使用的那套，與 projectY 同值但 x 原點為 136） */
+  function stageX(lon) { return (lon - 136) * 10; }
+  function stageY(lat) { return projectY(lat); }
   var pendingEpicenter = null;
+  function sprite(name) {
+    var targets = window.vm && window.vm.runtime && window.vm.runtime.targets;
+    return targets ? targets.find(function(t) { return t.getName && t.getName() === name; }) : null;
+  }
+  /* 專案是用「滑鼠位置 + 地圖中心 + 放大率」換算經群度寫入震源列表，
+     所以指定震集唯一可靠的做法是把滑鼠移到該點並點下去，
+     讓專案自己走過原本「點地圖決定震源」的流程。 */
+  function canvasEl() {
+    return document.querySelector('.sc-canvas') || document.querySelector('canvas');
+  }
+  function mouseAt(clientX, clientY, down) {
+    var c = canvasEl();
+    if(!c) return;
+    ['mousemove', down ? 'mousedown' : 'mouseup'].forEach(function(type) {
+      c.dispatchEvent(new MouseEvent(type, {
+        clientX: clientX, clientY: clientY, bubbles: true, cancelable: true, view: window, button: 1
+      }));
+    });
+  }
+  /* 經群度 -> canvas 腦幕像素。地圖中心已設為震集，
+     反推滑鼠位置使專案的換算結果吻合目標。 */
+  function clientPointFor(lat, lon) {
+    var c = canvasEl();
+    if(!c) return null;
+    var r = c.getBoundingClientRect();
+    if(!r.width || !r.height) return null;
+    var s = stage();
+    var zoom = (s && s.variables[VID.zoom] && Number(s.variables[VID.zoom].value)) || 1;
+    if(!zoom || zoom <= 0) zoom = 1;
+    /* 專案換算：座標変換x = 中心X + 滑鼠x / 放大率 */
+    var wantX = (lon - 136) * 10;
+    var mouseScratchX = (wantX - projectX(lon)) * zoom;
+    var sx = 240 + mouseScratchX;
+    var sy = 180;
+    return { x: r.left + (sx / 480) * r.width, y: r.top + (sy / 360) * r.height };
+  }
+  function clickEpicenter(lat, lon) {
+    var p = clientPointFor(lat, lon);
+    if(!p) return false;
+    mouseAt(p.x, p.y, false);
+    mouseAt(p.x, p.y, true);
+    mouseAt(p.x, p.y, false);
+    return true;
+  }
+  /* 規模與深度寫進列表；經群度由專案從滑鼠位置自行換算 */
   function markEpicenter(lat, lon) {
     var s = stage();
     if(!s) return false;
     var list = s.variables[LID.epicenter];
-    if(!list || !list.value) return false;
-    while(list.value.length < 7) list.value.push('');
-    list.value[0] = lon;
-    list.value[1] = lat;
-    list.value[2] = parseInt(slideD.value, 10);
-    list.value[3] = parseFloat(slideM.value);
+    if(list && list.value) {
+      while(list.value.length < 7) list.value.push('');
+      list.value[2] = parseInt(slideD.value, 10);
+      list.value[3] = parseFloat(slideM.value);
+    }
     if(s.variables[VID.lookX]) s.variables[VID.lookX].value = lon;
     if(s.variables[VID.lookY]) s.variables[VID.lookY].value = lat;
-    try {
-      if(window.vm && window.vm.runtime) {
-        window.vm.runtime.startHats('event_whenbroadcastreceived', {
-          BROADCAST_OPTION: '震央'
-        });
-      }
-    } catch(e) {}
     return true;
   }
-  function focusEpicenter(lat, lon) {
+  function focusEpicenter(lat, lon, opts) {
     var s = stage();
     if(!s) return;
+    var clickToo = !(opts && opts.noClick);
     pendingEpicenter = { lat: lat, lon: lon };
     if(s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
     if(s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
     if(s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
     markEpicenter(lat, lon);
+    if(!clickToo) return;
+    /* 地圖中心與放大率需一帧就位，之後再點換算才準確 */
+    var tries = 0;
+    var iv = setInterval(function() {
+      tries++;
+      if(clickEpicenter(lat, lon) || tries > 12) clearInterval(iv);
+    }, 90);
   }
   if(presetSel) presetSel.addEventListener('change', function() {
     var key = presetSel.value;
@@ -1158,19 +1210,29 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(window.vm) window.vm.greenFlag();
     hidePanel();
     if(!pendingEpicenter) return;
-    var lat = pendingEpicenter.lat, lon = pendingEpicenter.lon, tries = 0;
+    /* 綠旗會清空震源列表並等待重新決定。地圖中心先就位，
+       等一帧後在該位置模擬點擊，讓專案自己計算經群度并啟動震梗。 */
+    var lat = pendingEpicenter.lat, lon = pendingEpicenter.lon;
+    var armed = false, tries = 0;
     var timer = setInterval(function() {
-      tries++;
       var s = stage();
       var list = s && s.variables[LID.epicenter];
-      var cleared = list && list.value && list.value.length < 7;
-      if(cleared || tries > 25) {
-        clearInterval(timer);
-        markEpicenter(lat, lon);
+      var len = list && list.value ? list.value.length : -1;
+      if(!armed) {
         if(s && s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
         if(s && s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
+        if(s && s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
       }
-    }, 120);
+      if(!armed && len >= 0 && len < 7) {
+        armed = true;
+        markEpicenter(lat, lon);
+      }
+      tries++;
+      if(tries > 12) {
+        clearInterval(timer);
+        if(armed) clickEpicenter(lat, lon);
+      }
+    }, 100);
   }
 
   function currentSettings() {
