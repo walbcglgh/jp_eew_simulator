@@ -945,99 +945,86 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     applyVolume();
   });
   var PRESETS = {
-    jp:       { magnitude:9.0, depthKm:24, startOffsetSec:0, lat:38.1, lon:142.9 },
-    kumamoto: { magnitude:7.3, depthKm:12, startOffsetSec:0, lat:32.75, lon:130.76 },
-    hokkaido: { magnitude:6.7, depthKm:37, startOffsetSec:0, lat:42.69, lon:142.01 },
-    noto:     { magnitude:7.6, depthKm:16, startOffsetSec:0, lat:37.50, lon:137.27 },
-    hanshin:  { magnitude:7.3, depthKm:16, startOffsetSec:0, lat:34.60, lon:135.04 }
+    jp:       { magnitude:9.0, depthKm:24, startOffsetSec:0, lat:38.10, lon:142.90, name:'三陸沖' },
+    kumamoto: { magnitude:7.3, depthKm:12, startOffsetSec:0, lat:32.75, lon:130.76, name:'熊本県' },
+    hokkaido: { magnitude:6.7, depthKm:37, startOffsetSec:0, lat:42.69, lon:142.01, name:'胆振地方' },
+    noto:     { magnitude:7.6, depthKm:16, startOffsetSec:0, lat:37.50, lon:137.27, name:'能登半島' },
+    hanshin:  { magnitude:7.3, depthKm:16, startOffsetSec:0, lat:34.60, lon:135.04, name:'兵庫県南部' }
   };
-  /* 地圖中心座標（專案的 7-センターX/Y 單位） */
+  var pendingEpicenter = null;
+  /* 專案決定震央的流程：
+       1. 點地圖→震源X/Y→「座標変換」→經緯度寫入震源列表第 1、2 格
+       2. 列表長度 > 7 時「震源決定された」會改為 true
+       3. 「決定後の処理」等待該值與現在時間差 < 0.1 秒
+     因此不依賴模擬點擊（一次點擊就會新增一筆震源），
+     而是直接寫入列表並維持開啟那個開關。 */
+  function sprite(name) {
+    var targets = window.vm && window.vm.runtime && window.vm.runtime.targets;
+    return targets ? targets.find(function(t) { return t.getName && t.getName() === name; }) : null;
+  }
+  /* 地圖中心座標（專案 7-センターX/Y 單位） */
   function projectX(lon) {
-    var x = ((lon + 44) % 360) - 180;
-    return x * 10;
+    return (((lon + 44) % 360) - 180) * 10;
   }
   function projectY(lat) {
     var rad = (45 + lat / 2) * Math.PI / 180;
     return Math.log(Math.tan(rad)) * 572.9577951308232 - 374.04780730560344;
   }
-  /* 舞台座標（專案從滑鼠位置使用的那套，與 projectY 同值但 x 原點為 136） */
-  function stageX(lon) { return (lon - 136) * 10; }
-  function stageY(lat) { return projectY(lat); }
-  var pendingEpicenter = null;
-  function sprite(name) {
-    var targets = window.vm && window.vm.runtime && window.vm.runtime.targets;
-    return targets ? targets.find(function(t) { return t.getName && t.getName() === name; }) : null;
-  }
-  /* 專案是用「滑鼠位置 + 地圖中心 + 放大率」換算經群度寫入震源列表，
-     所以指定震集唯一可靠的做法是把滑鼠移到該點並點下去，
-     讓專案自己走過原本「點地圖決定震源」的流程。 */
-  function canvasEl() {
-    return document.querySelector('.sc-canvas') || document.querySelector('canvas');
-  }
-  function mouseAt(clientX, clientY, down) {
-    var c = canvasEl();
-    if(!c) return;
-    ['mousemove', down ? 'mousedown' : 'mouseup'].forEach(function(type) {
-      c.dispatchEvent(new MouseEvent(type, {
-        clientX: clientX, clientY: clientY, bubbles: true, cancelable: true, view: window, button: 1
-      }));
-    });
-  }
-  /* 經群度 -> canvas 腦幕像素。地圖中心已設為震集，
-     反推滑鼠位置使專案的換算結果吻合目標。 */
-  function clientPointFor(lat, lon) {
-    var c = canvasEl();
-    if(!c) return null;
-    var r = c.getBoundingClientRect();
-    if(!r.width || !r.height) return null;
-    var s = stage();
-    var zoom = (s && s.variables[VID.zoom] && Number(s.variables[VID.zoom].value)) || 1;
-    if(!zoom || zoom <= 0) zoom = 1;
-    /* 專案換算：座標変換x = 中心X + 滑鼠x / 放大率 */
-    var wantX = (lon - 136) * 10;
-    var mouseScratchX = (wantX - projectX(lon)) * zoom;
-    var sx = 240 + mouseScratchX;
-    var sy = 180;
-    return { x: r.left + (sx / 480) * r.width, y: r.top + (sy / 360) * r.height };
-  }
-  function clickEpicenter(lat, lon) {
-    var p = clientPointFor(lat, lon);
-    if(!p) return false;
-    mouseAt(p.x, p.y, false);
-    mouseAt(p.x, p.y, true);
-    mouseAt(p.x, p.y, false);
-    return true;
-  }
-  /* 規模與深度寫進列表；經群度由專案從滑鼠位置自行換算 */
-  function markEpicenter(lat, lon) {
+  /* 寫入震源列表：構位順序為 1=纬度、2=經度、3=深さ、4=マグニチュード */
+  function markEpicenter(lat, lon, name) {
     var s = stage();
     if(!s) return false;
     var list = s.variables[LID.epicenter];
-    if(list && list.value) {
-      while(list.value.length < 7) list.value.push('');
-      list.value[2] = parseInt(slideD.value, 10);
-      list.value[3] = parseFloat(slideM.value);
-    }
+    if(!list || !list.value) return false;
+    var v = list.value;
+    while(v.length < 7) v.push('');
+    v[0] = lat;
+    v[1] = lon;
+    v[2] = parseInt(slideD.value, 10);
+    v[3] = parseFloat(slideM.value);
     if(s.variables[VID.lookX]) s.variables[VID.lookX].value = lon;
     if(s.variables[VID.lookY]) s.variables[VID.lookY].value = lat;
+    if(name && s.variables[VID.epi1]) s.variables[VID.epi1].value = name;
+    try {
+      if(window.vm && window.vm.runtime) {
+        window.vm.runtime.startHats('event_whenbroadcastreceived', { BROADCAST_OPTION: '震央' });
+      }
+    } catch(e) {}
     return true;
   }
-  function focusEpicenter(lat, lon, opts) {
+  /* 開啟該專案的「震源決定された」（在実際の震源情報 sprite 上） */
+  function openDecided() {
+    var src = sprite('実際の震源情報');
+    if(src && src.variables && src.variables[VID.decided]) {
+      src.variables[VID.decided].value = true;
+      return true;
+    }
+    return false;
+  }
+  /* 專案的「処理」每帧可能重置門關，在列表維持 7 格期間持續打開它 */
+  function holdEpicenter() {
+    if(!pendingEpicenter) return;
     var s = stage();
     if(!s) return;
-    var clickToo = !(opts && opts.noClick);
-    pendingEpicenter = { lat: lat, lon: lon };
+    var list = s.variables[LID.epicenter];
+    if(!list || !list.value || list.value.length < 7) return;
+    var v = list.value;
+    v[2] = parseInt(slideD.value, 10);
+    v[3] = parseFloat(slideM.value);
+    if(s.variables[VID.lookX]) s.variables[VID.lookX].value = pendingEpicenter.lon;
+    if(s.variables[VID.lookY]) s.variables[VID.lookY].value = pendingEpicenter.lat;
+    if(pendingEpicenter.name && s.variables[VID.epi1]) s.variables[VID.epi1].value = pendingEpicenter.name;
+    openDecided();
+  }
+  function focusEpicenter(lat, lon, name) {
+    var s = stage();
+    if(!s) return;
+    pendingEpicenter = { lat: lat, lon: lon, name: name || '' };
     if(s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
     if(s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
     if(s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
-    markEpicenter(lat, lon);
-    if(!clickToo) return;
-    /* 地圖中心與放大率需一帧就位，之後再點換算才準確 */
-    var tries = 0;
-    var iv = setInterval(function() {
-      tries++;
-      if(clickEpicenter(lat, lon) || tries > 12) clearInterval(iv);
-    }, 90);
+    markEpicenter(lat, lon, name);
+    openDecided();
   }
   if(presetSel) presetSel.addEventListener('change', function() {
     var key = presetSel.value;
@@ -1045,7 +1032,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     var obj = PRESETS[key];
     if(!obj) return;
     if(applySettings(obj)) {
-      focusEpicenter(obj.lat, obj.lon);
+      focusEpicenter(obj.lat, obj.lon, obj.name);
       showToast(t('toastPreset'));
     }
   });
@@ -1081,6 +1068,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       '&t=' + parseInt(slideT.value, 10);
     if(pendingEpicenter) {
       url += '&lat=' + pendingEpicenter.lat + '&lon=' + pendingEpicenter.lon;
+      if(pendingEpicenter.name) url += '&name=' + encodeURIComponent(pendingEpicenter.name);
     }
     return url;
   }
@@ -1210,29 +1198,27 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(window.vm) window.vm.greenFlag();
     hidePanel();
     if(!pendingEpicenter) return;
-    /* 綠旗會清空震源列表並等待重新決定。地圖中心先就位，
-       等一帧後在該位置模擬點擊，讓專案自己計算經群度并啟動震梗。 */
-    var lat = pendingEpicenter.lat, lon = pendingEpicenter.lon;
-    var armed = false, tries = 0;
+    /* 綠旗將位置順序重組，震源列表開始是空的。
+       下面的輯件在 200ms 循环里會不斷重寫列表，只需在列表一旦補回就打開門關。 */
+    var lat = pendingEpicenter.lat, lon = pendingEpicenter.lon, name = pendingEpicenter.name;
+    var attempts = 0;
     var timer = setInterval(function() {
       var s = stage();
-      var list = s && s.variables[LID.epicenter];
-      var len = list && list.value ? list.value.length : -1;
-      if(!armed) {
-        if(s && s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
-        if(s && s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
-        if(s && s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
+      if(!s) return;
+      var list = s.variables[LID.epicenter];
+      var len = list && list.value ? list.value.length : 0;
+      if(len < 7) {
+        attempts++;
+        if(attempts > 60) { clearInterval(timer); return; }
+        return;
       }
-      if(!armed && len >= 0 && len < 7) {
-        armed = true;
-        markEpicenter(lat, lon);
-      }
-      tries++;
-      if(tries > 12) {
-        clearInterval(timer);
-        if(armed) clickEpicenter(lat, lon);
-      }
-    }, 100);
+      clearInterval(timer);
+      if(s.variables[VID.cx]) s.variables[VID.cx].value = projectX(lon);
+      if(s.variables[VID.cy]) s.variables[VID.cy].value = projectY(lat);
+      if(s.variables[VID.zoom]) s.variables[VID.zoom].value = 4;
+      markEpicenter(lat, lon, name);
+      openDecided();
+    }, 200);
   }
 
   function currentSettings() {
@@ -1244,6 +1230,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     if(pendingEpicenter) {
       s.lat = pendingEpicenter.lat;
       s.lon = pendingEpicenter.lon;
+      s.name = pendingEpicenter.name;
     }
     return s;
   }
@@ -1268,7 +1255,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       depthKm: q.has('d') ? parseFloat(q.get('d')) : parseInt(slideD.value, 10),
       startOffsetSec: q.has('t') ? parseFloat(q.get('t')) : parseInt(slideT.value, 10),
       lat: q.has('lat') ? parseFloat(q.get('lat')) : NaN,
-      lon: q.has('lon') ? parseFloat(q.get('lon')) : NaN
+      lon: q.has('lon') ? parseFloat(q.get('lon')) : NaN,
+      name: q.get('name') || ''
     };
   }
   function stamp() {
@@ -1305,7 +1293,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       catch(e) { showToast(t('toastBadJson')); return; }
       var s = (data && data.settings) ? data.settings : data;
       if(!s || !applySettings(s)) { showToast(t('toastBadFormat')); return; }
-      if(isFinite(numOr(s.lat, NaN)) && isFinite(numOr(s.lon, NaN))) focusEpicenter(Number(s.lat), Number(s.lon));
+      if(isFinite(numOr(s.lat, NaN)) && isFinite(numOr(s.lon, NaN)))
+        focusEpicenter(Number(s.lat), Number(s.lon), s.name || '');
       showToast(t('toastLoaded'));
     };
     rd.readAsText(f);
@@ -1358,11 +1347,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     applyVolume();
     var urlSettings = settingsFromUrl();
     if(urlSettings && applySettings(urlSettings)) {
-      if(isFinite(urlSettings.lat) && isFinite(urlSettings.lon)) focusEpicenter(urlSettings.lat, urlSettings.lon);
+      if(isFinite(urlSettings.lat) && isFinite(urlSettings.lon))
+        focusEpicenter(urlSettings.lat, urlSettings.lon, urlSettings.name);
       showToast(t('toastUrlApplied'));
     }
     updateEEWOverlay();
-    setInterval(function(){ hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); maybeShowHelp(); applyVolume(); }, 200);
+    setInterval(function(){
+      hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); maybeShowHelp(); applyVolume();
+      holdEpicenter();
+    }, 200);
     window.addEventListener('resize', updateEEWOverlay);
   }
 
