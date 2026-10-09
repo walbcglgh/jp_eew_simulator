@@ -769,28 +769,66 @@
   }
 
   function init() {
-    if(!window.vm||!window.vm.runtime||!window.vm.runtime.targets||window.vm.runtime.targets.length<2)
-      return setTimeout(init, 300);
-    showPanel();
-    applyLang();
-    pullVars();
-    applyVolume();
-    var urlSettings = settingsFromUrl();
-    if(urlSettings && applySettings(urlSettings)) {
-      if(isFinite(urlSettings.lat) && isFinite(urlSettings.lon))
-        focusEpicenter(urlSettings.lat, urlSettings.lon, urlSettings.name);
-      showToast(t('toastUrlApplied'));
-    }
-    updateEEWOverlay();
-    setInterval(function(){
-      hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); applyVolume();
-      holdEpicenter();
-    }, 200);
-    window.addEventListener('resize', updateEEWOverlay);
+    var retries = 0;
+    var maxRetries = 100; // 最多重試 30 秒
+    var checkInterval = setInterval(function() {
+      retries++;
+      
+      // 檢查 vm 是否準備好
+      if(window.vm && window.vm.runtime && window.vm.runtime.targets && window.vm.runtime.targets.length >= 2) {
+        clearInterval(checkInterval);
+        
+        try {
+          showPanel();
+          applyLang();
+          pullVars();
+          applyVolume();
+          
+          var urlSettings = settingsFromUrl();
+          if(urlSettings && applySettings(urlSettings)) {
+            if(isFinite(urlSettings.lat) && isFinite(urlSettings.lon))
+              focusEpicenter(urlSettings.lat, urlSettings.lon, urlSettings.name);
+            showToast(t('toastUrlApplied'));
+          }
+          
+          updateEEWOverlay();
+          setInterval(function(){
+            hideMonitors(); pullVars(); fixJMA(); updateEEWOverlay(); applyVolume();
+            holdEpicenter();
+          }, 200);
+          window.addEventListener('resize', updateEEWOverlay);
+          
+          console.log('[EEW Sim] UI initialized successfully');
+        } catch(e) {
+          console.error('[EEW Sim] UI initialization error:', e);
+          alert('UI 初始化失敗: ' + e.message);
+        }
+        return;
+      }
+      
+      // 如果超時，顯示錯誤訊息
+      if(retries >= maxRetries) {
+        clearInterval(checkInterval);
+        console.error('[EEW Sim] Failed to initialize: vm not ready after 30s');
+        var errDiv = document.createElement('div');
+        errDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#ff4444;color:white;padding:20px;border-radius:8px;font-family:sans-serif;max-width:400px;text-align:center;z-index:9999;';
+        errDiv.innerHTML = '<h3>載入失敗</h3><p>無法加載地震模擬器。<br>請檢查控制台 (F12) 的錯誤訊息。</p><p>常見原因：<br>- quake-sim-data.bin 找不到<br>- 網路問題</p>';
+        document.body.appendChild(errDiv);
+        return;
+      }
+    }, 300);
+    
+    // 同時監控 vm 是否出現
+    var vmCheck = setInterval(function() {
+      if(window.vm) {
+        clearInterval(vmCheck);
+        console.log('[EEW Sim] VM detected, waiting for runtime...');
+      }
+    }, 100);
   }
 
   new MutationObserver(hideMonitors).observe(document.body, {childList:true, subtree:true});
-  setTimeout(init, 800);
+  setTimeout(init, 500); // 稍微延遲等待 VM 加載
 })();
 </script>
 </body>
