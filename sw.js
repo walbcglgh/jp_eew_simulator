@@ -1,63 +1,59 @@
-const CACHE_NAME = 'eewsim-v1';
-const ASSETS_TO_CACHE = [
+/* PWA service worker for JapanEewSimulator
+ * Strategy:
+ *  - Precached shell (HTML/CSS/fonts/icon) so the app opens offline.
+ *  - quake-sim-data.bin is ~4MB, so it is cached on first successful load only.
+ *  - Never cache anything that is not a 200 basic response.
+ */
+const CACHE = 'eewsim-v1';
+const SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './quake-sim-data.bin',
-  './fonts/ZenMaruGothic-Regular.ttf',
-  './fonts/ZenMaruGothic-Medium.ttf',
-  './fonts/ZenMaruGothic-Bold.ttf'
+  './images/logo.jpg',
+  './fonts/ZenMaruGothic-Regular-subset.ttf',
+  './fonts/ZenMaruGothic-Medium-subset.ttf',
+  './fonts/ZenMaruGothic-Bold-subset.ttf'
 ];
 
-// Install event: cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
+    caches.open(CACHE)
+      .then((cache) => Promise.all(
+        SHELL.map((url) => cache.add(url).catch(() => null))
+      ))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate event: clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch event: serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then((response) => {
-          // Don't cache non-successful responses
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+    caches.match(req).then((hit) => {
+      if (hit) return hit;
+      return fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
           }
-          // Clone the response
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          return response;
-        });
-      })
+          return res;
+        })
+        .catch(() => caches.match('./index.html'));
+    })
   );
 });
